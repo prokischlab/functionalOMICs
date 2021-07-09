@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Dmitrii Smirnov" />
+
+<meta name="date" content="2021-07-09" />
+
+<title>Overview of variants used for OddsPath calculation</title>
+
+<script src="libR/header-attrs-2.8/header-attrs.js"></script>
+<script src="libR/jquery-1.12.4/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="libR/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="libR/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="libR/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="libR/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="libR/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="libR/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="libR/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="libR/navigation-1.1/tabsets.js"></script>
+<script src="libR/navigation-1.1/codefolding.js"></script>
+<link href="libR/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="libR/highlightjs-9.12.0/highlight.js"></script>
+<script src="libR/htmlwidgets-1.5.1/htmlwidgets.js"></script>
+<link href="libR/datatables-css-0.0.0/datatables-crosstalk.css" rel="stylesheet" />
+<script src="libR/datatables-binding-0.15/datatables.js"></script>
+<link href="libR/dt-core-1.10.20/css/jquery.dataTables.min.css" rel="stylesheet" />
+<link href="libR/dt-core-1.10.20/css/jquery.dataTables.extra.css" rel="stylesheet" />
+<script src="libR/dt-core-1.10.20/js/jquery.dataTables.min.js"></script>
+<link href="libR/crosstalk-1.1.0.1/css/crosstalk.css" rel="stylesheet" />
+<script src="libR/crosstalk-1.1.0.1/js/crosstalk.min.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+<link rel="stylesheet" href="lib/add_content_table.css" type="text/css" />
+<link rel="stylesheet" href="lib/leo_style.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div id="header">
+
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Overview of variants used for OddsPath calculation</h1>
+<h4 class="author">Dmitrii Smirnov</h4>
+<h4 class="date">2021-07-09</h4>
+
+</div>
+
+
+<div id="variant-summary" class="section level1">
+<h1>Variant summary</h1>
+<p>For calculation of the odds of pathogenicity (OddsPath), data from 130 genetically diagnosed individuals from Yepez et al. 2021 study was used. Due to data privacy policy, genetic data, available in-house, was not shared.</p>
+<div id="htmlwidget-9b6a4a8ac4b1a4fd8599" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-9b6a4a8ac4b1a4fd8599">{"x":{"filter":"none","data":[["1","2","3","4"],["Coding","Non-coding","PTV","Splice"],[82,18,45,11],[107,56,306,126]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Variant type<\/th>\n      <th>Pathogenic<\/th>\n      <th>Benign<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":[2,3]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+</div>
+<div id="pathogenic-variants" class="section level1">
+<h1>Pathogenic variants</h1>
+<p>Variants, reported as disease-causing (pathogenic) were considered</p>
+<pre class="r"><code># vtp &lt;- fread(&quot;data/pathogenic_variants.tsv&quot;)</code></pre>
+<div id="htmlwidget-56bd62723a6404aa8ab6" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-56bd62723a6404aa8ab6">{"x":{"filter":"none","caption":"<caption>Pathogenic variants<\/caption>","data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","37","38","39","40","41","42","43","44","45","46","47","48","49","50","51","52","53","54","55","56","57","58","59","60","61","62","63","64","65","66","67","68","69","70","71","72","73","74","75","76","77","78","79","80","81","82","83","84","85","86","87","88","89","90","91","92","93","94","95","96","97","98","99","100","101","102","103","104","105","106","107","108","109","110","111","112","113","114","115","116","117","118","119","120","121","122","123","124","125","126","127","128","129","130"],["NDUFS8","TIMMDC1","GTPBP3","FBXL4","TRMU","SLC25A10","ELAC2","NDUFB3","CLPP","MT-ND3","MGME1","MT-ND1","DNAJC3","DNAJC3","ELAC2","PRPS1","NDUFA10","MCOLN1","SBDS","TIMMDC1","MT-ND5","PC","GAMT","CDKL5","ACAD9","NDUFAF5","LYRM7","SQSTM1","LRPPRC","LPIN1","CCDC40","NBAS","IARS","TAZ","DICER1","NBAS","NBAS","NSUN3","EPG5","PURA","C1QBP","GPD1","ALDH18A1","UNC80","TXN2","TALDO1","PPA2","PPA2","TANGO2","FBXL4","SFXN4","NDUFS4","FDXR","GFER","ADPRHL2","CYP4X1","BCS1L","SLC19A1","SCN1A","SLC25A42","PPCS","ETFDH","KCNA2","HMGCS2","MRPL44","AP4B1","GNAO1","FDXR","CHD1","VPS33B","ADPRHL2","SELENON","YARS","ACAD9","RDH11","LIG3","NDUFA10","CLPB","F11","MT-ND6","DGUOK","MT-ND6","YME1L1","C19ORF70","DARS2","DNAJC30","NDUFAF5","MT-ND5","MRPL38","NFU1","MORC2","SLC25A4","TIMMDC1","CTR2","NDUFB11","SON","DLD","SSBP1","TWNK","TXNIP","DNAJC30","G6PD","GMPPB","RNF170","MED23","ASCC1","MEPCE","NAXE","RRM2B","CLDN11","DLD","TXNIP","TSFM","SUCLA2","FOXRED1","FH","EARS2","MRPS34","MRPS25","NDUFB11","STIM1","TRMT5","MT-TL1","UQCRFS1","NBAS","PEX1","STT3A","UFM1","ATP6AP1","PTCD3"],["c.229C>T; c.476C>A","c.596+2146A>G, p.Gly199_Thr200ins5*","c.1228dupC; c.1312G>A","c.1652T>A","c.835G>A","c.304A>T, p.Lys102*; c.574C>T, p.Pro192Ser","c.1559C>T; c.631C>T","c.64T>C; c.208G>T","c.661G>A; p.Glu221Lys","c.139G>A","c.456G>A, p.Trp152*","c.199A>G","c.580C>T, p.Arg194*","c.580C>T, p.Arg194*","c.460T>C","c.383A>T","c.-99_-75delACCCCGGCCGTGACGTCACGGCAGC, p.?","c.681-19A>C, p. Lys227_Leu228ins16*; c.832C>T, p.Gln278*","c.258+2T>C, p.Cys84Tyrfs*4","c.596+2146A>G, p.Gly199_Thr200ins5*","c.1177G>A","c.1891C>T; c.1217G>A","c.522G>A, p.Trp174*","c.2528delT","c.1690G>A; c.1832A>G","c.223-907A>C, c.604_605insA","c.52delA","c.2T>A","c.2595_2597delGGT","c.2550-865_2667-34del","c.1025A>G; c.2824_2825insCTGT","c.558_560delGAT, p.Ile187del;c.686dupT, p.Ser230Glnfs*4","c.3521T>A, p.Ile1174Asn; c.1252C>T, p.Arg418*","c.348C>T, p.Gly116_Arg123del","c.4295C>T; c.760G>A","c.2708T>G","c.3164T>C, p.Leu1055Pro;c.3010C>T, p.Arg1004*","3kbp del; c.295C>T, p.Arg99*","c.5548T>C","c.629dupG","c.823C>T","c.1982C>A, p.Ser661* ;c.1858TC>T.p.Arg620Trp","c.1982C>A; c.1858C>T","c.7214C>A; c.1806G>C","c.71G>A","c.345dupA, p.Asp116Argfs*80","c.500C>T","c.500C>T","c.4delT, p.Cys2Alafs*35; c.56þ1_57-1_(*1_?)del","uc003ppf.1,FBXL4,-,662T->A,1,non-syn,Asp221Val:","c.739dupA, p.Arg247Lysfs*19; c.471+1G>A, p.Thr158Metfs∗38","c.466_469dupAAGT, p.Ser157*","uc010wri.2,FDXR,-,527C->A,1,non-syn,Arg176Leu; uc010wrk.2,FDXR,-,35G->C,1,non-syn,Ser12Trp:","uc002cob.3,GFER,+,197_197delC (p.Arg67Glyfs*83),1,frame-shift,2034415,-C,del: uc002cob.3,GFER,+,586C->T,0,non-syn,Arg196Cys:","c.[1004T>G];[1004T>G] n.d.;p.[Val335Gly];[Val335Gly]","heterozygous uc001cqt.3,CYP4X1,+,136T->C,0,non-syn,Phe46Leu: and uc001cqt.3,CYP4X1,+,137T->C,1,non-syn,Phe46Ser:","uc002vis.4,BCS1L,+,296C->T,1,non-syn,Pro99Leu:","uc010gpy.1,SLC19A1,-,1579C->T,0,non-syn,Gly527Ser: ;uc010gpy.1,SLC19A1,-,1525C->T,0,non-syn,Glu509Lys:","uc010fpk.3,SCN1A,-,707A->G,1,non-syn,Ile236Thr:","c.380+2T>A, p.Ala128*","uc001chl.3,PPCS,+,319_333delCCTTCGGGCCCAGCC,0,del_5aa;uc001chl.3,PPCS,+,538G->C,0,non-syn,Ala180Pro: uc001chk.3","uc003iqb.3,ETFDH,+,687_688delAA,2,frame-shift,159616650,-AA,del: uc003iqb.3","uc009wfv.2,KCNA2,-,881C->T,1,non-syn,Arg294His:","uc021osx.1,HMGCS2,-,310C->G,0,non-syn,Asp104His:","uc002vnr.4,MRPL44,+,A->G,near splicesite","c.1216C>T, p.Arg406*","uc002eit.4,GNAO1,+,709G->A,0,non-syn,Glu237Lys:","uc010wri.2,FDXR,-,902C->T,1,non-syn,Cys301Tyr: , uc010wri.2,FDXR,-,527C->A,1,non-syn,Arg176Leu:","c.184_187delTCAG, p.Glu63Leufs*185","c.1236delC, p.Lys413Argfs*6","uc001bzt.3,ADPRHL2,+,1004T->G,1,non-syn,Val335Gly:","c.713dupA, p.Asn238Lysfs*?; c.1397G->A, p.Arg466Gln:","uc001bvy.1,YARS,-,176A->G,1,non-syn,Ile59Thr:","uc003ela.4,ACAD9,+,1A->G,0,non-syn,Met1Val: uc003ela.4,ACAD9,+,261T->G,2,non-syn,Ile87Met:","c.[637A>C], p.[Thr213Pro]","c.86G>A, p.Trp29*; c.1611+208G>A, p.?","c.-99_-75delACCCCGGCCGTGACGTCACGGCAGC, p.?","uc001osi.3,CLPB,-,502C->T,0,non-syn,Gly168Arg:","uc003iza.1,F11,+,730C->T,0,non-syn,Gln244Stop:","14453G<A","c.353G>T, p.Arg118Leu; cnv","14453G<A","c.616C>T","c.143delT, p.Val48Alafs*42, c.29+272G>C, p.Phe11Trpfs*5","c.492+2T>C, p.Lys133_Lys164del, c.228-12C>G, p.?, c.228-20T>C, p.?","c.152A>G","c.223-907A>C, p.Glu74_Val75ins19*; c.604_605insA, p.Leu203Valfs*22","m.13094T>C","c.770C>G, p.Pro257Arg, c.1-174del127, p.?","c.362T>C, p.Val121Ala; CNV","c.77C>T, p.Ala26Val","c.598G>A, p.Gly200Arg","c.596+2146A>G, p.Gly199_Thr200ins5*","","c.440T>C, p.Met147Thr","c.5753_5756delTTAG, p.Val1918Glufs*87","c.685G>T, p.Gly229Cys; c.1046+5G>T, p.Ile293_Asn349del","c.394A>G","c.1302C>G, p.416Gfs*7","uc001enn.4,TXNIP,+,642_643insT,0,frame-shift,145440336,+T,ins:","c.152A>G","c.961G>A; p.Val321Met","c.1016_1017insGCCTT","17 kb deletion of first 5 exons","c.3734dupT, p.Leu1245Phefs*32; c.635T>C, p.Phe212Ser","c.574-1471_831-5742del24223","c.1552 C> T, p.Arg518*","c.292-12C>G, p.?","c.328C>T, p.Arg110Cys; chr8:103160286 C>T, p.?","c.370T>C","c.685G>T, p.Gly229Cys","c.257dupA; p.Asn86LysfsTer2","c.997C>T","c.985A>G; c.850C>T","c.406C>T","c.1048C>T","c.911C>A","c.62T>C","c.327+75G>A, p.Glu110_Glu111ins*","c.349T>C","c.326A>G","c.697A>G; c.433A>G","chrM:3243 A>G","c.215-1G>C, p.Val72_Thr81del10","c.3164T>C; c.603_605delCCT","c.1842delA, p.Glu615Lysfs*30; c.1240-1551A>G, p.Trp413_Ile414ins11*","c.137A>G","c.1-273_271delTCA, p.?","chrX:153659943C>T","c.1435-1G>C; c.1918C>G"],["compound\nheterozygous","homozygous","compound\nheterozygous","homozygous","homozygous","compound\nheterozygous","compound\nheterozygous","compound\nheterozygous","homozygous","homozygous","homozygous","homozygous","homozygous","homozygous","homozygous","heterozygous","homozygous","compound\nheterozygous","homozygous","homozygous","homozygous","compound\nheterozygous","homozygous","heterozygous","compound\nheterozygous","compound\nheterozygous","homozygous","homozygous","homozygous","homozygous","compound\nheterozygous","compound\nheterozygous","compound\nheterozygous","homozygous","compound\nheterozygous","homozygous","compound\nheterozygous","compound\nheterozygous","homozygous","heterozygous","homozygous","homozygous","compound\nheterozygous","compound\nheterozygous","homozygous","homozygous","homozygous","homozygous","compound\nheterozygous","homozygous","compound\nheterozygous","homozygous","compound\nheterozygous","compound\nheterozygous","homozygous","compound\nheterozygous","homozygous","compound\nheterozygous","heterozygous","homozygous","compound\nheterozygous","heterozygous","heterozygous","homozygous","homozygous","homozygous","heterozygous","compound\nheterozygous","heterozygous","homozygous","homozygous","compound\nheterozygous","homozygous","compound\nheterozygous","homozygous","compound\nheterozygous","homozygous","heterozygous","heterozygous","heterozygous","compound\nheterozygous","heterozygous","homozygous","compound\nheterozygous","compound\nheterozygous","homozygous","compound\nheterozygous","heterozygous","compound\nheterozygous","compound\nheterozygous","heterozygous","homozygous","homozygous","compound\nheterozygous","homozygous","heterozygous","compound\nheterozygous","homozygous","homozygous","compound\nheterozygous","homozygous","heterozygous","homozygous","homozygous","compound\nheterozygous","homozygous","heterozygous","homozygous","compound\nheterozygous","heterozygous","compound\nheterozygous","homozygous","homozygous","compound\nheterozygous","homozygous","homozygous","compound\nheterozygous","homozygous","homozygous","homozygous","heterozygous","compound\nheterozygous","heterozygous","homozygous","compound\nheterozygous","compound\nheterozygous","heterozygous","homozygous","heterozygous","compound\nheterozygous"],["missense; missense","intronic","frameshift; missense","missense","missense","stop; missense","missense; stop","missense; stop","missense","missense","stop","missense","stop","stop","missense","missense","5UTR","intronic; stop","splice_donor","intronic","missense","missense; missense","stop","frameshift","missense; missense","intronic; insertion","frameshift","start_loss","indel","deletion (1759 bp)","missense; frameshift","indel; frameshift","missense; stop","synonymous","missense; missense","missense","missense; stop","deletion; stop","missense","frameshift","missense","missense","stop; missense","missense; missense","stop","frameshift","missense","missense","frameshift; cnv","missense","frameshift; splicesite","frameshift","missense; missense","frame-shift; missense","missense","missense; missense","missense","missense; missense","missense","splicesite","del; missense","frameshift","missense","missense","near splicesite","stop","missense","missense; missense","frameshift","frameshift","missense","frameshift; missense","missense","missense; missense","missense","stop; intron","5UTR","missense","stop","missense","missense; deletion","missense","missense","frameshift; intronic","splice; intronic","missense","startloss; intronic","missense","missense; 5UTR deletion","missense; deletion","missense","splice","intronic","missense; missense","missense","frameshift","missense; splice region","missense","synonymous","frameshift; frameshift","missense","missense","frameshift","cnv","frameshift; missense","cnv","stop","intronic","missense; intergenic","stoploss de novo","missense; ?","frameshift","missense","missense; missense","missense","missense","missense","missense","intronic","missense","missense","missense; missense","missense","splicesite","missense; del","frameshift; intronic","missense","deletion","intronic","splice_acceptor; missense"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Causal gene<\/th>\n      <th>Variants<\/th>\n      <th>Genotype<\/th>\n      <th>Variant effect<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"order":[],"autoWidth":false,"orderClasses":false,"columnDefs":[{"orderable":false,"targets":0}]}},"evals":[],"jsHooks":[]}</script>
+</div>
+<div id="benign-variants" class="section level1">
+<h1>Benign variants</h1>
+<p>Variants, detected in genetically diagnosed individuals, were considered benign if following criteria were met: 1) Rare variants (MAF &lt; 0.01 in gnomAD) reported “Benign” or “Likely benign” in ClinVar and were classified as “Benign” with InterVar 2) Frequent (MAF &gt; 0.05 in gnomAD) stop and frameshift variants not reported in ClinVar</p>
+<div id="htmlwidget-2bb05b60aa4f8454dfc6" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-2bb05b60aa4f8454dfc6">{"x":{"filter":"none","caption":"<caption>Benign variants<\/caption>","data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","37","38","39","40","41","42","43","44","45","46","47","48","49","50","51","52","53","54","55","56","57","58","59","60","61","62","63","64","65","66","67","68","69","70","71","72","73","74","75","76","77","78","79","80","81","82","83","84","85","86","87","88","89","90","91","92","93","94","95","96","97","98","99","100","101","102","103","104","105","106","107","108","109","110","111","112","113","114","115","116","117","118","119","120","121","122","123","124","125","126","127","128","129","130","131","132","133","134","135","136","137","138","139","140","141","142","143","144","145","146","147","148","149","150","151","152","153","154","155","156","157","158","159","160","161","162","163","164","165","166","167","168","169","170","171","172","173","174","175","176","177","178","179","180","181","182","183","184","185","186","187","188","189","190","191","192","193","194","195","196","197","198","199","200","201","202","203","204","205","206","207","208","209","210","211","212","213","214","215","216","217","218","219","220","221","222","223","224","225","226","227","228","229","230","231","232","233","234","235","236","237","238","239","240","241","242","243","244","245","246","247","248","249","250","251","252","253","254","255","256","257","258","259","260","261","262","263","264","265","266","267","268","269","270","271","272","273","274","275","276","277","278","279","280","281","282","283","284","285","286","287","288","289","290","291","292","293","294","295","296","297","298","299","300","301","302","303","304","305","306","307","308","309","310","311","312","313","314","315","316","317","318","319","320","321","322","323","324","325","326","327","328","329","330","331","332","333","334","335","336","337","338","339","340","341","342","343","344","345","346","347","348","349","350","351","352","353","354","355","356","357","358","359","360","361","362","363","364","365","366","367","368","369","370","371","372","373","374","375","376","377","378","379","380","381","382","383","384","385","386","387","388","389","390","391","392","393","394","395","396","397","398","399","400","401","402","403","404","405","406","407","408","409","410","411","412","413","414","415","416","417","418","419","420","421","422","423","424","425","426","427","428","429","430","431","432","433","434","435","436","437","438","439","440","441","442","443","444","445","446","447","448","449","450","451","452","453","454","455","456","457","458","459","460","461","462","463","464","465","466","467","468","469","470","471","472","473","474","475","476","477","478","479","480","481","482","483","484","485","486","487","488","489","490","491","492","493","494","495","496","497","498","499","500","501","502","503","504","505","506","507","508","509","510","511","512","513","514","515","516","517","518","519","520","521","522","523","524","525","526","527","528","529","530","531","532","533","534","535","536","537","538","539","540","541","542","543","544","545","546","547","548","549","550","551","552","553","554","555","556","557","558","559","560","561","562","563","564","565","566","567","568","569","570","571","572","573","574","575","576","577","578","579","580","581","582","583","584","585","586","587","588","589","590","591","592","593","594","595"],["PIKFYVE","RTN2","SON","SON","TICAM1","BRCA1","BRCA1","SON","SON","AARS","ADNP","ELAC2","MAP3K1","SON","SON","NFU1","RIN2","SON","SON","FBN1","PITPNM3","SON","SON","NFU1","SON","BRCA2","EHMT1","SON","SON","NFU1","SON","SON","AFG3L2","ANKRD11","NFU1","SOS1","WRN","EFEMP1","NR3C2","SETBP1","SON","SON","NFU1","PITPNM3","SON","SON","BMPR2","NFU1","ZNF469","ANK2","AP4E1","NFU1","SON","SON","VPS13A","BRCA2","BRIP1","FBXO38","MYH9","NFU1","SON","SON","DOCK6","NFU1","PLCB4","SON","SON","VPS13A","ASCC1","NSDHL","SON","SON","TCIRG1","FBN1","NF1","SON","SON","SRCAP","DNM1L","FANCC","NOTCH1","SCARB2","TRPM4","KAT6A","NFU1","POLR1D","SON","SON","NFU1","SON","SON","ANK2","NFU1","SON","SON","TSC2","BRIP1","SON","SON","ACTG1","SON","SON","TCOF1","DSG2","NEDD4L","NFU1","NSDHL","SON","SON","TSC2","COL11A1","NFU1","SON","SON","NFU1","SON","SON","SRCAP","PLAU","SON","SON","SRCAP","TICAM1","NFU1","SON","SON","BMP1","FAS","GLI3","NFU1","NOTCH1","SON","SON","WNK1","BRCA2","CHKB","DOCK6","DSG2","FGF14","NFU1","NOTCH1","PDGFRA","SON","SON","VCAN","NFU1","RAI1","SON","SON","STAT1","NFU1","SON","SON","IGF1R","RB1","SON","SON","BMPR2","NEDD4L","PLCB4","SON","SON","BRCA1","NFU1","POLR1D","SON","SON","ANKRD11","ANKRD26","NFU1","NOTCH1","RAB7A","RANBP2","SON","SON","NFU1","SELENON","SON","SON","SON","SON","TCOF1","ZFYVE26","NFU1","SON","SON","CACNA1C","SON","SON","ASCC1","NFU1","SON","SON","NFU1","SON","SON","WNT5A","DCN","RAB7A","RB1","SON","SON","COL12A1","FOXE1","IGF1R","NFU1","PLAU","BMP1","NFU1","PIKFYVE","SON","SON","GLI3","SON","SON","SOS1","COL1A1","NFU1","KIF7","NFU1","PLCE1","SON","SON","THRA","DCN","SON","SON","NFU1","SON","SON","YME1L1","ABCC9","NFU1","SON","SON","VCP","RIN2","RIN2","SON","SON","INF2","INF2","LDLRAP1","NFU1","PIKFYVE","SON","BMPR1B","DNM1","NFU1","RAI1","SON","SON","ZFYVE26","APC","APC","NFU1","SON","SON","TTBK2","ATR","BMPR1B","HNRNPA2B1","BRIP1","SON","SON","ASXL1","MYH9","NFU1","SON","SON","WRN","ACTB","APC","ATP2C1","KIF1B","TCOF1","TTBK2","SON","SON","ANKRD26","IFIH1","NFU1","PIKFYVE","ZFYVE26","ANK2","EPHA2","MYO6","NFU1","PLAU","SON","SON","BRIP1","SON","SON","NFU1","SON","SON","SON","SON","NFU1","SON","ZFYVE26","COL10A1","DOCK6","NFU1","SH3BP2","SON","SON","ADAMTS10","ATL3","FGF14","NFU1","SON","SON","TRPM4","BRCA2","CREBBP","NFU1","SON","SON","MYH9","NFU1","SON","MYO1C","NFU1","SON","SON","SRCAP","SON","SON","ANKRD26","BRCA2","DCHS1","NFU1","NR3C2","SON","SON","ANK1","NFU1","SIK1","SON","SON","BARD1","DIAPH3","EPHA2","KIF1B","NFU1","SON","SON","SRCAP","FBN1","SON","SON","BRIP1","CHD8","NFU1","PLAU","SKI","SON","SON","FUS","HSD11B1","INF2","INF2","SON","SON","ACTB","FGFR3","NFU1","SON","SON","GHR","NFU1","SON","SON","SGCE","SON","SON","ASCC1","KIT","SON","SON","STAT5B","YME1L1","APC","BCR","DYNC1H1","EEF2","MYO1C","RANBP2","RIN2","SMAD9","SON","SON","STAT1","ZFYVE26","INF2","INF2","NFU1","NOTCH1","SON","SON","GSN","NFU1","ZFYVE26","NFU1","RIN2","YME1L1","KIF7","MYH9","NFU1","PLCE1","SON","ZFYVE26","FOXP1","NFU1","SLC3A1","TCF12","NFU1","SON","SON","NFU1","SON","SON","TRPV4","FGFR3","IFIH1","JAG1","MFF","NFU1","ADNP","ANKH","KRIT1","NFU1","SON","NFU1","CREBBP","NFU1","SON","SON","UNC93B1","ATP2C1","COL5A1","IFIH1","NFU1","SON","SON","THRA","BICD2","NFU1","SON","NFU1","PRKG1","SON","NFU1","SON","SON","NFIX","NFU1","SON","SON","TBL1XR1","HSPB1","NFU1","SON","SON","BRIP1","FBN1","NFU1","SON","SON","ERBB2","SON","SON","THRA","APC","SON","TTBK2","ACTB","BICD2","SON","SON","SRCAP","TCF12","ANKRD11","SON","SON","SOS1","DCN","KIF7","SON","SON","FBN1","NFU1","SON","SON","SON","SON","NFU1","TRPV4","NFU1","PIK3CD","SCARB2","SON","SON","ITGA2","SON","SON","DYRK1A","NFU1","SON","SON","WNK1","ANKRD11","DNM1","IFIH1","MET","SON","SON","NFU1","PLCB4","SON","SON","TSC2","DNM2","KIF1B","SON","SON","DOCK6","FOXP1","NFU1","RTN2","SMAD9","SON","SON","TBL1XR1","ACTB","CACNA1C","IDH2","MYO1C","NFU1","PIKFYVE","PLAU","SON","SON","SRCAP","TBL1XR1","SON","FLNA","NFU1","SON","SON","TCIRG1","BRCA1","LPIN1","MYO1C","MYO1C","SON","SON","TRPV4","ZFYVE26","ERCC6","HSF4","NFU1","NOTCH1","PRKG1","SON","SON","TSC2","ABCC9","PNPT1","SON","SON","BRIP1","EPB41L1","SON","SON","SON","SON","LAMP2","NFU1","SON","SON","TCOF1","BARD1","NEXN","NFU1","PIKFYVE","SON","SON","ZNF469","NFU1","SNRNP200","SON","SON"],["2","19","21","21","19","17","17","21","21","16","20","17","5","21","21","2","20","21","21","15","17","21","21","2","21","13","9","21","21","2","21","21","18","16","2","2","8","2","4","18","21","21","2","17","21","21","2","2","16","4","15","2","21","21","9","13","17","5","22","2","21","21","19","2","20","21","21","9","10","X","21","21","11","15","17","21","21","16","12","9","9","4","19","8","2","13","21","21","2","21","21","4","2","21","21","16","17","21","21","17","21","21","5","18","18","2","X","21","21","16","1","2","21","21","2","21","21","16","10","21","21","16","19","2","21","21","8","10","7","2","9","21","21","12","13","22","19","18","13","2","9","4","21","21","5","2","17","21","21","2","2","21","21","15","13","21","21","2","18","20","21","21","17","2","13","21","21","16","10","2","9","3","2","21","21","2","1","21","21","21","21","5","14","2","21","21","12","21","21","10","2","21","21","2","21","21","3","12","3","13","21","21","6","9","15","2","10","8","2","2","21","21","7","21","21","2","17","2","15","2","10","21","21","17","12","21","21","2","21","21","10","12","2","21","21","9","20","20","21","21","14","14","1","2","2","21","4","9","2","17","21","21","14","5","5","2","21","21","15","3","4","7","17","21","21","20","22","2","21","21","8","7","5","3","1","5","15","21","21","10","2","2","2","14","4","1","6","2","10","21","21","17","21","21","2","21","21","21","21","2","21","14","6","19","2","4","21","21","19","11","13","2","21","21","19","13","16","2","21","21","22","2","21","17","2","21","21","16","21","21","10","13","11","2","4","21","21","8","2","21","21","21","2","13","1","1","2","21","21","16","15","21","21","17","14","2","10","1","21","21","16","1","14","14","21","21","7","4","2","21","21","5","2","21","21","7","21","21","10","4","21","21","17","10","5","22","14","19","17","2","20","13","21","21","2","14","14","14","2","9","21","21","9","2","14","2","20","10","15","22","2","10","21","14","3","2","2","15","2","21","21","2","21","21","12","4","2","20","2","2","20","5","7","2","21","2","16","2","21","21","11","3","9","2","2","21","21","17","9","2","21","2","10","21","2","21","21","19","2","21","21","3","7","2","21","21","17","15","2","21","21","17","21","21","17","5","21","15","7","9","21","21","16","15","16","21","21","2","12","15","21","21","15","2","21","21","21","21","2","12","2","1","4","21","21","5","21","21","21","2","21","21","12","16","9","2","7","21","21","2","20","21","21","16","19","1","21","21","19","3","2","19","13","21","21","3","7","12","15","17","2","2","10","21","21","16","3","21","X","2","21","21","11","17","2","17","17","21","21","12","14","10","16","2","9","10","21","21","16","12","2","21","21","17","20","21","21","21","21","X","2","21","21","5","2","1","2","2","21","21","16","2","2","21","21"],["209200102","45997992","34948684","34948696","4816688","41201105","41228491","34948684","34948696","70305794","49508469","12899263","56177692","34948684","34948696","69659126","19956133","34948684","34948696","48807681","6373682","34948684","34948696","69659126","34948696","32914592","140611424","34948684","34948696","69659126","34948684","34948696","12377152","89348801","69659126","39224037","30938513","56150861","149001286","42644826","34948684","34948696","69659126","6373682","34948684","34948696","203379710","69659126","88498477","114213561","51200936","69659126","34948684","34948696","79938131","32914592","59924512","147774426","36681918","69659126","34948684","34948696","11323999","69659126","9374275","34948684","34948696","79938131","73964243","152037592","34948684","34948696","67810474","48748913","29653237","34948684","34948696","30732558","32875454","98011497","139396933","77087389","49674846","41789825","69659126","28196100","34948684","34948696","69659126","34948684","34948696","114213561","69659126","34948684","34948696","2124416","59924512","34948684","34948696","79479389","34948684","34948696","149740691","29101156","55996244","69659126","152037592","34948684","34948696","2134508","103379977","69659126","34948684","34948696","69659126","34948684","34948696","30740333","75675086","34948684","34948696","30750590","4816688","69659126","34948684","34948696","22064355","90768680","42063171","69659126","139397677","34948684","34948696","980497","32914592","51018204","11323999","29101156","102568872","69659126","139397677","55127413","34948684","34948696","82789493","69659126","17696987","34948684","34948696","191856001","69659126","34948684","34948696","99451976","49050826","34948684","34948696","203379710","55996244","9424868","34948684","34948696","41243509","69659126","28196100","34948684","34948696","89347289","27328937","69659126","139397728","128526409","109388151","34948684","34948696","69659126","26138412","34948684","34948696","34948684","34948696","149743806","68219043","69659126","34948684","34948696","2705088","34948684","34948696","73964243","69659126","34948684","34948696","69659126","34948684","34948696","55504456","91539458","128526409","49050826","34948684","34948696","75843076","100616481","99451976","69659126","75672059","22064355","69659126","209203249","34948684","34948696","42063171","34948684","34948696","39281905","48263001","69659126","90177008","69659126","95993931","34948684","34948696","38244509","91539458","34948684","34948696","69659126","34948684","34948696","27436461","21971087","69659126","34948684","34948696","35068298","19956094","19956311","34948684","34948696","105174186","105180607","25890248","69659126","209200102","34948696","96075833","130986523","69659126","17696987","34948684","34948696","68219043","112151320","112176556","69659126","34948684","34948696","43075755","142269106","96075833","26236034","59924512","34948684","34948696","31023472","36681918","69659126","34948684","34948696","30938513","5569298","112174762","130613401","10364335","149753894","43075755","34948684","34948696","27328937","163134090","69659126","209200102","68219043","114213561","16464919","76596587","69659126","75672059","34948684","34948696","59924512","34948684","34948696","69659126","34948684","34948696","34948684","34948696","69659126","34948696","68219043","116446506","11323999","69659126","2834047","34948684","34948696","8654127","63420035","102568872","69659126","34948684","34948696","49674846","32912560","3819294","69659126","34948684","34948696","36681918","69659126","34948696","1371325","69659126","34948684","34948696","30740333","34948684","34948696","27326133","32912560","6653585","69659126","149075889","34948684","34948696","41573266","69659126","44836902","34948684","34948696","215674261","60485919","16464919","10364335","69659126","34948684","34948696","30732644","48748913","34948684","34948696","59924512","21899776","69659126","75675086","2235513","34948684","34948696","31195598","209907731","105174186","105180607","34948684","34948696","5569298","1806041","69659126","34948684","34948696","42688957","69659126","34948684","34948696","94214710","34948684","34948696","73964243","55575673","34948684","34948696","40369223","27436461","112174456","23634790","102507911","3977976","1371325","109345582","19956311","37441435","34948684","34948696","191856001","68219043","105174186","105180607","69659126","139409976","34948684","34948696","124083579","69659126","68250147","69659126","19941467","27436461","90177008","36681918","69659126","95993931","34948696","68250147","71007355","69659126","44502905","57565432","69659126","34948684","34948696","69659126","34948684","34948696","110234519","1806041","163133396","10623266","228221851","69659126","49508508","14751305","91855846","69659126","34948696","69659126","3819294","69659126","34948684","34948696","67767160","130649377","137710863","163134090","69659126","34948684","34948696","38244509","95477559","69659126","34948684","69659126","52913038","34948684","69659126","34948684","34948696","13192555","69659126","34948684","34948696","176767818","75932038","69659126","34948684","34948696","59924512","48807681","69659126","34948684","34948696","37879585","34948684","34948696","38244509","112179153","34948696","43075755","5569298","95477559","34948684","34948696","30732558","57565432","89348078","34948684","34948696","39224037","91539458","90177008","34948684","34948696","48748913","69659126","34948684","34948696","34948684","34948696","69659126","110234519","69659126","9784435","77087389","34948684","34948696","52361665","34948684","34948696","38850470","69659126","34948684","34948696","980497","89348801","130986523","163134090","116339642","34948684","34948696","69659126","9424868","34948684","34948696","2134492","10941061","10435065","34948684","34948696","11323999","71007355","69659126","45997992","37441435","34948684","34948696","176767818","5569298","2614070","90627553","1383868","69659126","209200102","75672059","34948684","34948696","30732558","176767818","34948684","153583046","69659126","34948684","34948696","67810474","41226488","11932055","1373742","1386932","34948684","34948696","110234519","68219043","50667120","67203777","69659126","139397728","52913038","34948684","34948696","2112941","22005422","55887325","34948684","34948696","59924512","34773198","34948684","34948696","34948684","34948696","119573071","69659126","34948684","34948696","149762684","215674261","78407911","69659126","209200102","34948684","34948696","88497219","69659126","96943442","34948684","34948696"],["A","T","G","GA","C","T","T","G","GA","G","C","G","G","G","GA","A","G","G","GA","G","G","G","GA","A","GA","C","C","G","GA","A","G","GA","G","G","A","C","A","G","C","G","G","GA","A","G","G","GA","T","A","A","G","G","A","G","GA","C","C","C","T","C","A","G","GA","C","A","A","G","GA","C","G","C","G","GA","G","C","G","G","GA","C","C","G","G","G","C","G","A","G","G","GA","A","G","GA","G","A","G","GA","G","C","G","GA","G","G","GA","T","T","C","A","C","G","GA","G","G","A","G","GA","A","G","GA","A","T","G","GA","C","C","A","G","GA","G","G","C","A","C","G","GA","A","C","T","C","T","C","A","C","C","G","GA","G","A","C","G","GA","C","A","G","GA","G","G","G","GA","T","C","C","G","GA","T","A","G","G","GA","T","C","A","C","C","T","G","GA","A","G","G","GA","G","GA","G","G","A","G","GA","C","G","GA","G","A","G","GA","A","G","GA","C","A","C","G","G","GA","G","A","G","A","G","G","A","A","G","GA","C","G","GA","G","G","A","T","A","A","G","GA","C","A","G","GA","A","G","GA","TGC","A","A","G","GA","T","C","G","G","GA","C","T","G","A","A","GA","G","C","A","C","G","GA","G","A","G","A","G","GA","G","T","G","A","C","G","GA","A","C","A","G","GA","A","C","G","C","T","G","G","G","GA","C","C","A","A","G","G","G","C","A","G","G","GA","C","G","GA","A","G","GA","G","GA","A","GA","G","A","C","A","T","G","GA","G","G","C","A","G","GA","C","G","C","A","G","GA","C","A","GA","C","A","G","GA","A","G","GA","T","G","C","A","C","G","GA","G","A","C","G","GA","C","A","G","T","A","G","GA","C","C","G","GA","C","G","A","T","G","G","GA","G","G","C","T","G","GA","C","G","A","G","GA","G","A","G","GA","T","G","GA","G","A","G","GA","T","TGC","A","G","C","G","C","T","G","A","G","GA","C","G","C","T","A","C","G","GA","G","A","C","A","T","TGC","T","C","A","A","GA","C","A","A","T","C","A","G","GA","A","G","GA","G","G","G","T","A","A","C","C","C","A","GA","A","C","A","G","GA","G","G","C","C","A","G","GA","C","C","A","G","A","C","G","A","G","GA","G","A","G","GA","T","G","A","G","GA","C","G","A","G","GA","A","G","GA","C","C","GA","G","C","C","G","GA","C","C","C","G","GA","C","A","T","G","GA","C","A","G","GA","G","GA","A","G","A","T","G","G","GA","T","G","GA","C","A","G","GA","A","G","C","C","G","G","GA","A","C","G","GA","G","C","A","G","GA","C","A","A","T","A","G","GA","T","C","G","G","C","A","A","G","G","GA","C","T","G","G","A","G","GA","G","C","A","G","C","G","GA","G","G","T","G","A","C","C","G","GA","C","G","C","G","GA","C","C","G","GA","G","GA","C","A","G","GA","G","C","C","A","A","G","GA","G","A","G","G","GA"],["G","C","GA","G","T","A","C","GA","G","A","G","A","C","GA","G","T","A","GA","G","C","A","GA","G","T","G","T","T","GA","G","T","GA","G","A","A","T","T","G","A","T","A","GA","G","T","A","GA","G","C","T","C","A","A","T","GA","G","T","T","T","C","T","T","GA","G","T","T","G","GA","G","T","C","T","GA","G","A","T","A","GA","G","A","T","A","A","A","T","A","T","A","GA","G","T","GA","G","A","T","GA","G","A","T","GA","G","A","GA","G","C","G","T","T","T","GA","G","T","A","T","GA","G","T","GA","G","G","C","GA","G","A","T","T","GA","G","A","A","G","T","A","GA","G","G","T","C","T","G","A","T","A","T","GA","G","A","T","T","GA","G","T","T","GA","G","A","A","GA","G","C","T","A","GA","G","C","T","A","GA","G","C","G","T","T","G","G","GA","G","T","A","GA","G","GA","G","A","A","T","GA","G","T","GA","G","C","T","GA","G","T","GA","G","T","G","G","A","GA","G","A","G","A","T","A","A","T","G","GA","G","G","GA","G","A","A","T","C","T","T","GA","G","T","G","GA","G","T","GA","G","T","G","T","GA","G","C","A","A","GA","G","T","C","A","T","G","G","C","T","T","T","GA","G","A","G","A","T","GA","G","A","G","C","G","T","GA","G","G","T","T","GA","G","G","A","A","A","C","A","A","GA","G","G","A","T","G","A","A","A","T","T","A","GA","G","T","GA","G","T","GA","G","GA","G","T","G","A","T","T","T","A","GA","G","C","A","A","T","GA","G","T","A","T","T","GA","G","T","T","G","T","T","GA","G","G","GA","G","C","A","G","T","T","GA","G","A","T","T","GA","G","A","G","A","C","T","GA","G","T","T","GA","G","T","A","T","C","A","GA","G","A","C","T","C","GA","G","A","A","T","GA","G","C","T","GA","G","C","GA","G","C","G","GA","G","C","T","T","A","G","C","T","A","A","G","GA","G","T","A","T","C","T","T","GA","G","A","T","T","T","C","T","C","T","T","T","G","T","T","T","A","T","T","GA","G","T","GA","G","A","A","A","G","G","T","T","T","T","T","G","T","T","T","GA","G","A","A","T","A","T","GA","G","T","T","T","GA","T","T","GA","T","GA","G","A","T","GA","G","C","A","T","GA","G","T","C","T","GA","G","G","GA","G","T","G","G","A","A","T","GA","G","A","T","T","GA","G","T","G","C","GA","G","T","T","GA","G","GA","G","T","A","T","C","A","GA","G","C","GA","G","G","T","GA","G","G","A","T","A","T","GA","G","T","A","GA","G","A","G","G","GA","G","T","T","T","C","G","GA","G","C","A","T","A","T","T","G","A","GA","G","A","C","GA","A","T","GA","G","A","A","G","T","T","GA","G","A","A","G","T","T","T","T","GA","G","G","A","T","GA","G","T","T","GA","G","GA","G","T","T","GA","G","T","A","G","T","G","GA","G","T","T","A","GA","G"],["heterozygous","heterozygous","homozygous","homozygous","heterozygous","compound\nheterozygous","compound\nheterozygous","homozygous","homozygous","heterozygous","heterozygous","heterozygous","heterozygous","homozygous","homozygous","compound\nheterozygous","heterozygous","homozygous","homozygous","heterozygous","heterozygous","homozygous","homozygous","heterozygous","homozygous","heterozygous","heterozygous","homozygous","homozygous","heterozygous","homozygous","homozygous","heterozygous","heterozygous","compound\nheterozygous","compound\nheterozygous","compound\nheterozygous","heterozygous","heterozygous","heterozygous","homozygous","homozygous","compound\nheterozygous","heterozygous","homozygous","homozygous","heterozygous","compound\nheterozygous","heterozygous","heterozygous","heterozygous","heterozygous","homozygous","homozygous","compound\nheterozygous","heterozygous","heterozygous","heterozygous","heterozygous","heterozygous","homozygous","homozygous","compound\nheterozygous","homozygous","heterozygous","homozygous","homozygous","heterozygous","compound\nheterozygous","homozygous","homozygous","homozygous","heterozygous","heterozygous","heterozygous","homozygous","homozygous","heterozygous","heterozygous","heterozygous","heterozygous","heterozygous","heterozygous","heterozygous","heterozygous","heterozygous","homozygous","homozygous","heterozygous","homozygous","homozygous","compound\nheterozygous","heterozygous","homozygous","homozygous","heterozygous","heterozygous","homozygous","homozygous","heterozygous","homozygous","homozygous","heterozygous","heterozygous","heterozygous","homozygous","heterozygous","homozygous","homozygous","heterozygous","heterozygous","heterozygous","homozygous","homozygous","compound\nheterozygous","homozygous","homozygous","compound\nheterozygous","heterozygous","homozygous","homozygous","compound\nheterozygous","heterozygous","compound\nheterozygous","homozygous","homozygous","heterozygous","heterozygous","heterozygous","heterozygous","heterozygous","homozygous","homozygous","heterozygous","heterozygous","compound\nheterozygous","compound\nheterozygous","heterozygous","heterozygous","compound\nheterozygous","compound\nheterozygous","heterozygous","homozygous","homozygous","heterozygous","heterozygous","compound\nheterozygous","homozygous","homozygous","homozygous","compound\nheterozygous","homozygous","homozygous","heterozygous","compound\nheterozygous","homozygous","homozygous","heterozygous","heterozygous","heterozygous","homozygous","homozygous","heterozygous","heterozygous","heterozygous","homozygous","homozygous","heterozygous","heterozygous","homozygous","heterozygous","heterozygous","compound\nheterozygous","homozygous","homozygous","heterozygous","heterozygous","homozygous","homozygous","homozygous","homozygous","heterozygous","heterozygous","heterozygous","homozygous","homozygous","compound\nheterozygous","homozygous","homozygous","compound\nheterozygous","homozygous","homozygous","homozygous","heterozygous","homozygous","homozygous","heterozygous","compound\nheterozygous","heterozygous","compound\nheterozygous","homozygous","homozygous","compound\nheterozygous","heterozygous","heterozygous","compound\nheterozygous","heterozygous","heterozygous","heterozygous","heterozygous","homozygous","homozygous","heterozygous","homozygous","homozygous","heterozygous","heterozygous","compound\nheterozygous","heterozygous","compound\nheterozygous","heterozygous","homozygous","homozygous","heterozygous","heterozygous","homozygous","homozygous","heterozygous","homozygous","homozygous","compound\nheterozygous","compound\nheterozygous","heterozygous","homozygous","homozygous","heterozygous","compound\nheterozygous","compound\nheterozygous","homozygous","homozygous","compound\nheterozygous","compound\nheterozygous","heterozygous","homozygous","heterozygous","homozygous","heterozygous","heterozygous","heterozygous","heterozygous","homozygous","homozygous","compound\nheterozygous","compound\nheterozygous","compound\nheterozygous","heterozygous","homozygous","homozygous","heterozygous","heterozygous","heterozygous","heterozygous","heterozygous","homozygous","homozygous","heterozygous","heterozygous","heterozygous","homozygous","homozygous","heterozygous","heterozygous","heterozygous","heterozygous","compound\nheterozygous","heterozygous","heterozygous","homozygous","homozygous","heterozygous","heterozygous","homozygous","heterozygous","compound\nheterozygous","compound\nheterozygous","heterozygous","homozygous","compound\nheterozygous","heterozygous","homozygous","homozygous","heterozygous","homozygous","homozygous","homozygous","homozygous","homozygous","homozygous","homozygous","heterozygous","homozygous","heterozygous","heterozygous","compound\nheterozygous","compound\nheterozygous","homozygous","homozygous","homozygous","heterozygous","heterozygous","heterozygous","homozygous","homozygous","homozygous","compound\nheterozygous","heterozygous","heterozygous","compound\nheterozygous","homozygous","homozygous","compound\nheterozygous","heterozygous","homozygous","compound\nheterozygous","heterozygous","homozygous","homozygous","heterozygous","homozygous","homozygous","heterozygous","heterozygous","heterozygous","homozygous","heterozygous","homozygous","homozygous","compound\nheterozygous","heterozygous","compound\nheterozygous","homozygous","homozygous","heterozygous","heterozygous","heterozygous","heterozygous","heterozygous","homozygous","homozygous","heterozygous","compound\nheterozygous","homozygous","homozygous","heterozygous","heterozygous","homozygous","heterozygous","heterozygous","homozygous","homozygous","heterozygous","heterozygous","compound\nheterozygous","compound\nheterozygous","homozygous","homozygous","heterozygous","heterozygous","homozygous","homozygous","homozygous","heterozygous","heterozygous","homozygous","homozygous","heterozygous","homozygous","homozygous","compound\nheterozygous","heterozygous","homozygous","homozygous","homozygous","compound\nheterozygous","compound\nheterozygous","heterozygous","heterozygous","compound\nheterozygous","heterozygous","compound\nheterozygous","heterozygous","compound\nheterozygous","homozygous","homozygous","heterozygous","heterozygous","compound\nheterozygous","compound\nheterozygous","heterozygous","compound\nheterozygous","homozygous","homozygous","compound\nheterozygous","homozygous","compound\nheterozygous","compound\nheterozygous","compound\nheterozygous","compound\nheterozygous","heterozygous","heterozygous","homozygous","heterozygous","homozygous","heterozygous","heterozygous","compound\nheterozygous","compound\nheterozygous","heterozygous","heterozygous","homozygous","homozygous","heterozygous","homozygous","homozygous","heterozygous","homozygous","heterozygous","heterozygous","heterozygous","compound\nheterozygous","heterozygous","compound\nheterozygous","heterozygous","homozygous","homozygous","compound\nheterozygous","heterozygous","homozygous","homozygous","homozygous","heterozygous","heterozygous","compound\nheterozygous","heterozygous","heterozygous","homozygous","homozygous","heterozygous","heterozygous","heterozygous","homozygous","heterozygous","homozygous","homozygous","heterozygous","homozygous","homozygous","heterozygous","heterozygous","homozygous","homozygous","heterozygous","heterozygous","heterozygous","homozygous","homozygous","heterozygous","compound\nheterozygous","homozygous","homozygous","homozygous","heterozygous","homozygous","homozygous","heterozygous","heterozygous","homozygous","heterozygous","heterozygous","heterozygous","homozygous","homozygous","heterozygous","heterozygous","heterozygous","homozygous","homozygous","heterozygous","heterozygous","heterozygous","homozygous","homozygous","heterozygous","heterozygous","homozygous","homozygous","homozygous","homozygous","compound\nheterozygous","heterozygous","homozygous","heterozygous","heterozygous","homozygous","homozygous","heterozygous","homozygous","homozygous","heterozygous","heterozygous","homozygous","homozygous","heterozygous","heterozygous","heterozygous","heterozygous","heterozygous","homozygous","homozygous","homozygous","compound\nheterozygous","homozygous","homozygous","heterozygous","heterozygous","compound\nheterozygous","homozygous","homozygous","heterozygous","heterozygous","heterozygous","heterozygous","heterozygous","homozygous","homozygous","heterozygous","heterozygous","compound\nheterozygous","heterozygous","heterozygous","homozygous","heterozygous","heterozygous","homozygous","homozygous","heterozygous","heterozygous","homozygous","homozygous","heterozygous","homozygous","homozygous","heterozygous","heterozygous","heterozygous","compound\nheterozygous","compound\nheterozygous","homozygous","homozygous","heterozygous","compound\nheterozygous","heterozygous","heterozygous","heterozygous","compound\nheterozygous","heterozygous","homozygous","homozygous","heterozygous","heterozygous","heterozygous","homozygous","homozygous","heterozygous","heterozygous","homozygous","homozygous","homozygous","homozygous","heterozygous","heterozygous","homozygous","homozygous","heterozygous","compound\nheterozygous","heterozygous","homozygous","compound\nheterozygous","homozygous","homozygous","heterozygous","heterozygous","heterozygous","homozygous","homozygous"],["Splice","Splice","PTV","PTV","Coding","Non-coding","Non-coding","PTV","PTV","Splice","Coding","Splice","Coding","PTV","PTV","PTV","Splice","PTV","PTV","Splice","Splice","PTV","PTV","PTV","PTV","Coding","Splice","PTV","PTV","PTV","PTV","PTV","Non-coding","Splice","PTV","Non-coding","Coding","Non-coding","Non-coding","Non-coding","PTV","PTV","PTV","Splice","PTV","PTV","Splice","PTV","Splice","Non-coding","Non-coding","PTV","PTV","PTV","Splice","Coding","Coding","Splice","Coding","PTV","PTV","PTV","Splice","PTV","Coding","PTV","PTV","Splice","PTV","Splice","PTV","PTV","Coding","Splice","Splice","PTV","PTV","Coding","Splice","Coding","Splice","Non-coding","Splice","Splice","PTV","Non-coding","PTV","PTV","PTV","PTV","PTV","Non-coding","PTV","PTV","PTV","Non-coding","Coding","PTV","PTV","Splice","PTV","PTV","Non-coding","Coding","Coding","PTV","Splice","PTV","PTV","Coding","Non-coding","PTV","PTV","PTV","PTV","PTV","PTV","Coding","Coding","PTV","PTV","Splice","Coding","PTV","PTV","PTV","Non-coding","Splice","Coding","PTV","Splice","PTV","PTV","Coding","Coding","Coding","Splice","Coding","Coding","PTV","Splice","Splice","PTV","PTV","Coding","PTV","Coding","PTV","PTV","Splice","PTV","PTV","PTV","Coding","Non-coding","PTV","PTV","Splice","Coding","Coding","PTV","PTV","Coding","PTV","Non-coding","PTV","PTV","Splice","Coding","PTV","Splice","Splice","Splice","PTV","PTV","PTV","Non-coding","PTV","PTV","PTV","PTV","Coding","Non-coding","PTV","PTV","PTV","Splice","PTV","PTV","PTV","PTV","PTV","PTV","PTV","PTV","PTV","Splice","Non-coding","Splice","Non-coding","PTV","PTV","Splice","Splice","Coding","PTV","Coding","Non-coding","PTV","Splice","PTV","PTV","Coding","PTV","PTV","Splice","Splice","PTV","Coding","PTV","Splice","PTV","PTV","Splice","Non-coding","PTV","PTV","PTV","PTV","PTV","PTV","Splice","PTV","PTV","PTV","Coding","Splice","Coding","PTV","PTV","Coding","Splice","Coding","PTV","Splice","PTV","Non-coding","Splice","PTV","Coding","PTV","PTV","Non-coding","Non-coding","Splice","PTV","PTV","PTV","Splice","Splice","Non-coding","Splice","Coding","PTV","PTV","Coding","Coding","PTV","PTV","PTV","Coding","Splice","Splice","Non-coding","Coding","Coding","Splice","PTV","PTV","Coding","PTV","PTV","Splice","Non-coding","Non-coding","Coding","Coding","PTV","Coding","PTV","PTV","Coding","PTV","PTV","PTV","PTV","PTV","PTV","PTV","PTV","PTV","Non-coding","Coding","Splice","PTV","Non-coding","PTV","PTV","Splice","Splice","Coding","PTV","PTV","PTV","Splice","Splice","Coding","PTV","PTV","PTV","Coding","PTV","PTV","Splice","PTV","PTV","PTV","Coding","PTV","PTV","Splice","Splice","Coding","PTV","Splice","PTV","PTV","Splice","PTV","Coding","PTV","PTV","Coding","Coding","Coding","Coding","PTV","PTV","PTV","Coding","Splice","PTV","PTV","Coding","Splice","PTV","Coding","Splice","PTV","PTV","Coding","Splice","Coding","Splice","PTV","PTV","Splice","Non-coding","PTV","PTV","PTV","Non-coding","PTV","PTV","PTV","Non-coding","PTV","PTV","PTV","Coding","PTV","PTV","Splice","PTV","Splice","Coding","Coding","Splice","Splice","Splice","Coding","Splice","PTV","PTV","Splice","Non-coding","Coding","Splice","PTV","Coding","PTV","PTV","Coding","PTV","Coding","PTV","Non-coding","PTV","Coding","Coding","PTV","Splice","PTV","Coding","Non-coding","PTV","Splice","Splice","PTV","PTV","PTV","PTV","PTV","PTV","Non-coding","Non-coding","Coding","Non-coding","Non-coding","PTV","Coding","Coding","Splice","PTV","PTV","PTV","Coding","PTV","PTV","PTV","Non-coding","Splice","Splice","PTV","PTV","PTV","PTV","Splice","Splice","PTV","PTV","PTV","Splice","PTV","PTV","PTV","PTV","Splice","PTV","PTV","PTV","Splice","Splice","PTV","PTV","PTV","Coding","Splice","PTV","PTV","PTV","Coding","PTV","PTV","Splice","Coding","PTV","Splice","Splice","Splice","PTV","PTV","Coding","Splice","Splice","PTV","PTV","Non-coding","Non-coding","Coding","PTV","PTV","Splice","PTV","PTV","PTV","PTV","PTV","PTV","Non-coding","PTV","Splice","Non-coding","PTV","PTV","Splice","PTV","PTV","Non-coding","PTV","PTV","PTV","Coding","Splice","Splice","PTV","Coding","PTV","PTV","PTV","Coding","PTV","PTV","Splice","Splice","Splice","PTV","PTV","Splice","Non-coding","PTV","Splice","Splice","PTV","PTV","Splice","Splice","Splice","Coding","Coding","PTV","Splice","Coding","PTV","PTV","Coding","Splice","PTV","Coding","PTV","PTV","PTV","Coding","Coding","Coding","Coding","Coding","PTV","PTV","Non-coding","Non-coding","Coding","Non-coding","PTV","Splice","Splice","PTV","PTV","Non-coding","Splice","Splice","PTV","PTV","Coding","Splice","PTV","PTV","PTV","PTV","Coding","PTV","PTV","PTV","Non-coding","Coding","Non-coding","PTV","Splice","PTV","PTV","Coding","PTV","Splice","PTV","PTV"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Gene<\/th>\n      <th>Chr<\/th>\n      <th>Position<\/th>\n      <th>Ref<\/th>\n      <th>Alt<\/th>\n      <th>Genotype<\/th>\n      <th>Variant effect<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"order":[],"autoWidth":false,"orderClasses":false,"columnDefs":[{"orderable":false,"targets":0}]}},"evals":[],"jsHooks":[]}</script>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

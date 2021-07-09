@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Dmitrii Smirnov" />
+
+<meta name="date" content="2021-07-09" />
+
+<title>Overview of RNA-seq studies and data used for OddsPath</title>
+
+<script src="libR/header-attrs-2.8/header-attrs.js"></script>
+<script src="libR/jquery-1.12.4/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="libR/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="libR/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="libR/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="libR/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="libR/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="libR/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="libR/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="libR/navigation-1.1/tabsets.js"></script>
+<script src="libR/navigation-1.1/codefolding.js"></script>
+<link href="libR/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="libR/highlightjs-9.12.0/highlight.js"></script>
+<script src="libR/htmlwidgets-1.5.1/htmlwidgets.js"></script>
+<link href="libR/datatables-css-0.0.0/datatables-crosstalk.css" rel="stylesheet" />
+<script src="libR/datatables-binding-0.15/datatables.js"></script>
+<link href="libR/dt-core-1.10.20/css/jquery.dataTables.min.css" rel="stylesheet" />
+<link href="libR/dt-core-1.10.20/css/jquery.dataTables.extra.css" rel="stylesheet" />
+<script src="libR/dt-core-1.10.20/js/jquery.dataTables.min.js"></script>
+<link href="libR/crosstalk-1.1.0.1/css/crosstalk.css" rel="stylesheet" />
+<script src="libR/crosstalk-1.1.0.1/js/crosstalk.min.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+<link rel="stylesheet" href="lib/add_content_table.css" type="text/css" />
+<link rel="stylesheet" href="lib/leo_style.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div id="header">
+
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Overview of RNA-seq studies and data used for OddsPath</h1>
+<h4 class="author">Dmitrii Smirnov</h4>
+<h4 class="date">2021-07-09</h4>
+
+</div>
+
+
+<div id="diagnostic-rates-in-the-rna-seq-studies" class="section level1">
+<h1>Diagnostic rates in the RNA-seq studies</h1>
+<p>Eight studies with a minimum of 20 cases investigated a total of 660 cases by RNA-seq and provided a molecular diagnosis to 104 WES/WGS inconclusive cases (16%), additionally confirming known pathogenic variants in diagnosed cases</p>
+<pre class="r"><code>p00</code></pre>
+<p><img src="Scripts_RNA_seq_1_Overview_RNAseq_studies_files/figure-html/unnamed-chunk-4-1.png" width="1056" /> <div id="htmlwidget-fa43393ca21b72723167" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-fa43393ca21b72723167">{"x":{"filter":"none","caption":"<caption>Supplementary Table 1. RNA-seq studies overview<\/caption>","data":[["1","2","3","4","5","6","7","8"],["Gonorazky et al. 2019","Kremer et al. 2017","Lee et al. 2020","Cummings et al. 2017","Frésard et al. 2019","Murdock et al. 2020","Kopajtich et al., 2021","Yepez et al., 2021"],[25,48,48,50,80,83,121,205],[9,5,7,17,6,14,13,33],[0.36,0.1,0.15,0.34,0.08,0.17,0.11,0.16]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>ID<\/th>\n      <th>Undiagnosed_individuals<\/th>\n      <th>Diagnosed_individuals<\/th>\n      <th>Diagnostic_rate<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":[2,3,4]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script></p>
+</div>
+<div id="genetic-diagnosis-in-the-rna-seq-studies" class="section level1">
+<h1>Genetic diagnosis in the RNA-seq studies</h1>
+<p>Proportions of pathogenic alleles causing aberrant RNA phenotypes.</p>
+<pre class="r"><code>p3c</code></pre>
+<p><img src="Scripts_RNA_seq_1_Overview_RNAseq_studies_files/figure-html/unnamed-chunk-8-1.png" width="960" /> <div id="htmlwidget-7d940eda19ec5a58f5be" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-7d940eda19ec5a58f5be">{"x":{"filter":"none","caption":"<caption>Supplementary Table 2, Collected cases<\/caption>","data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","37","38","39","40","41","42","43","44","45","46","47","48","49","50","51","52","53","54","55","56","57","58","59","60","61","62","63","64","65","66","67","68","69","70","71","72","73","74","75","76","77","78","79","80","81","82","83","84","85","86","87","88","89","90","91","92","93","94","95","96","97","98","99","100","101","102","103","104","105","106","107","108","109","110","111","112","113","114","115","116","117","118","119","120"],["Kremer et al. 2017","Kremer et al. 2017","Kremer et al. 2017","Kremer et al. 2017","Kremer et al. 2017","Kremer et al. 2017","Kremer et al. 2017","Kremer et al. 2017","Cummings et al. 2017","Cummings et al. 2017","Cummings et al. 2017","Cummings et al. 2017","Cummings et al. 2017","Cummings et al. 2017","Cummings et al. 2017","Cummings et al. 2017","Cummings et al. 2017","Cummings et al. 2017","Cummings et al. 2017","Cummings et al. 2017","Cummings et al. 2017","Cummings et al. 2017","Cummings et al. 2017","Cummings et al. 2017","Cummings et al. 2017","Gonorazky et al. 2019","Gonorazky et al. 2019","Gonorazky et al. 2019","Gonorazky et al. 2019","Gonorazky et al. 2019","Gonorazky et al. 2019","Gonorazky et al. 2019","Gonorazky et al. 2019","Gonorazky et al. 2019","Gonorazky et al. 2019","Frésard et al. 2019","Frésard et al. 2019","Frésard et al. 2019","Lee et al. 2020","Lee et al. 2020","Lee et al. 2020","Lee et al. 2020","Lee et al. 2020","Lee et al. 2020","Lee et al. 2020","Murdock et al. 2020","Murdock et al. 2020","Murdock et al. 2020","Murdock et al. 2020","Murdock et al. 2020","Murdock et al. 2020","Murdock et al. 2020","Murdock et al. 2020","Murdock et al. 2020","Murdock et al. 2020","Murdock et al. 2020","Murdock et al. 2020","Murdock et al. 2020","Murdock et al. 2020","Kopajtich et al., 2021","Kopajtich et al., 2021","Kopajtich et al., 2021","Yepez et al., 2021","Yepez et al., 2021","Yepez et al., 2021","Yepez et al., 2021","Yepez et al., 2021","Yepez et al., 2021","Yepez et al., 2021","Yepez et al., 2021","Yepez et al., 2021","Yepez et al., 2021","Yepez et al., 2021","Yepez et al., 2021","Yepez et al., 2021","Yepez et al., 2021","Yepez et al., 2021","Yepez et al., 2021","Yepez et al., 2021","Yepez et al., 2021","Yepez et al., 2021","Yepez et al., 2021","Yepez et al., 2021","Yepez et al., 2021","Yepez et al., 2021","Yepez et al., 2021","Yepez et al., 2021","Yepez et al., 2021","Yepez et al., 2021","Yepez et al., 2021","Yepez et al., 2021","Yepez et al., 2021","Yepez et al., 2021","Yepez et al., 2021","Yepez et al., 2021","Yepez et al., 2021","Yepez et al., 2021","Yepez et al., 2021","Yepez et al., 2021","Yepez et al., 2021","Yepez et al., 2021","Yepez et al., 2021","Yepez et al., 2021","Yepez et al., 2021","Yepez et al., 2021","Yepez et al., 2021","Yepez et al., 2021","Yepez et al., 2021","Yepez et al., 2021","Yepez et al., 2021","Yepez et al., 2021","Yepez et al., 2021","Yepez et al., 2021","Yepez et al., 2021","Yepez et al., 2021","Yepez et al., 2021","Yepez et al., 2021","Yepez et al., 2021","Yepez et al., 2021","Yepez et al., 2021"],["80858","80860","80861","80863","80864","80868","80870","81539","E2","C9","E4","C6","N33","C7","N29","N30","N31","N32","N25","C11","N22","C1","C3","C2","C4","Case4","Case5","Case6","Case7","Case8","Case9","Case15","Case17","Case35","Case38","28","13","49","1","2","3","4","5","6","7","Case1","Case2","Case3","Case4","Case5","Case6","Case7","Case8","Case9","Case10","Case11","Case12","Case13","Case14","OM26649","OM70698","OM27390","R16250","R31640","R95723","R55237","R18626","R34820","R74065","R25912","R27473","R70186","R30525","R64055","R15748","R66814","R77365","R21993","R42505","R64948","R21470","R11258","R64046","R26710","R29620","R54158","R19907","R28774","R96820","R64921","R52016","R80184","R62943","R98254","R86287","R89912","R19100","R16472","R80346","R15264","R44456","R91273","R58859","R63087","R45867","R36605","R61100","R77611","R51757","R20754","R25473","R21147","R46723","R59185","R33391","R66696","R24289","R98349","R60537","R70961"],["DPYD","DPYD","DPYD","DPYD","DPYD","DPYD","DPYD","TXN2","NEB","NEB","TTN","DMD","DMD","DMD","COL6A1","COL6A1","COL6A1","COL6A1","NEB","RYR1","TTN","POMGNT1","DMD","DMD","DMD","RYR1","GMPPB","POMT2","LAMA2","TTN","DMD","LAMA2","GAA","DMD","DYSF","KCTD7","ASAH1","MECR","SEPSECS","LMNA","SLC25A46","DMD","SARS2","MPV17","COL6A1","PQBP1","CLTC","KANSL1","SPR","NSD2","CHASERR","ROR2","TBCK","RPL13","PRUNE1","LZTR1","LZTR1","HNRNPK","AP4M1","AARS2","TXNIP","MORC2","DGUOK","RNF170","MED23","ASCC1","NSUN3","SBDS","SLC25A10","CHD1","GAMT","NBAS","AP4B1","TALDO1","TANGO2","VPS33B","SELENON","SON","UQCRFS1","MEPCE","SFXN4","ELAC2","MGME1","IARS","NBAS","DNAJC3","DNAJC3","TIMMDC1","CLPP","MCOLN1","TIMMDC1","ALDH18A1","C19ORF70","MRPL38","DARS2","NFU1","SLC25A4","MRPS25","LIG3","TIMMDC1","MRPL44","ETFDH","TAZ","SLC25A42","MRPS30","TWNK","NAXE","DLD","NDUFA10","UFM1","PEX1","NDUFA10","NDUFAF5","NDUFS4","NDUFAF5","LPIN1","RRM2B","DLD","ATP6AP1","PTCD3"],["2","2","2","2","2","2","2","2","2","2","2","1","1","1","1","1","1","1","2","2","2","2","1","1","1","2","2","1","2","2","?","2","2","1","2","2","2","2","2","1","2","1","2","2","1","1","1","1","2","1","1","1","2","1","2","1","1","1","2","2","2","1","2","2","2","2","2","2","2","1","2","2","2","2","2","2","2","1","2","1","2","2","2","2","2","2","2","2","2","2","2","2","2","2","2","2","2","2","2","2","2","1","2","2","","2","2","2","2","2","2","2","2","2","2","2","2","2","1","2"],["splice","splice","splice","splice","splice","splice","splice","nonsense","splice","frameshift","frameshift","intronic","intronic","intronic","intronic","intronic","intronic","intronic","nonsense","missense","frameshift","splice","indel","indel","indel","missense","missense","missense","frameshift","frameshift","intronic","missense","missense","intronic","intronic","synonymous","splice","splice","frameshift","intronic","missense","intronic","missense","nonsense","intronic","intronic","CNV","CNV","promoter","CNV","CNV","intronic","CNV","splice","synonymous","intronic","intronic","intronic","intronic","missense","frameshift","missense","missense","deletion","frameshift","deletion","nonsense","splice","nonsense","frameshift","nonsense","indel","nonsense","frameshift","frameshift","frameshift","frameshift","frameshift","splice","nonsense","frameshift","nonsense","nonsense","nonsense","nonsense","nonsense","nonsense","intronic","missense","inonsense","intronic","nonsense","frameshift","missense","splice","missense","splice","intronic","nonsense","intronic","splice","frameshift","synonymous","splice","intronic","synonymous","intronic","missense","5UTR","promoter","frameshift","5UTR","start-loss","frameshift","frameshift","deletion","missense","splice","intronic","splice"],["splice","splice","splice","splice","splice","splice","splice","nonsense","splice","splice","splice",null,null,null,null,null,null,null,"intronic","synonymous","missense","synonymous",null,null,null,"synonymous","5UTR",null,"frameshift","intronic",null,"synonymous","intronic",null,"intronic","synonymous","splice","intronic","synonymous",null,"intronic",null,"synonymous","splice",null,null,null,null,"promoter",null,null,null,"CNV",null,"synonymous",null,null,null,"intronic","missense","frameshift",null,"deletion","deletion","missense","deletion","deletion","splice","synonymous",null,"nonsense","frameshift","nonsense","frameshift","deletion","frameshift","missense",null,"splice",null,"splice","missense","nonsense","missense","missense","nonsense","nonsense","intronic","missense","intronic","intronic","missense","intronic","5UTR","intronic","CNV","splice","intronic","intronic","intronic","splice",null,"synonymous","splice",null,"synonymous","intronic","missense","5UTR","promoter","intronic","5UTR","intronic","frameshift","intronic","deletion","intergenic","missense",null,"missense"],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,0,1,1,1,1,0,0,0,1,null,null,null,null,null,null,null,1,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,0,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,0,0,1,0,1,0],[0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,1,0,0,0,1,1,0,0,1,0,0,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,1,1,0,1,1,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0],[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,1,1,0,0,0,1,0,0,0,0,1,1,1,0,0,0,1,0,1,0,0,0,0,0,0,1,1,1,1,0,1,0,1,0,0,1,0,1,1,0,1,1,1,1,1,0,0,0,0,0,1,0,1,1,0,1,0,1]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Study<\/th>\n      <th>CaseID<\/th>\n      <th>Causal gene<\/th>\n      <th>Alleles<\/th>\n      <th>Variant1<\/th>\n      <th>Variant2<\/th>\n      <th>Aberrant\nexpression<\/th>\n      <th>MAE<\/th>\n      <th>Aberrant\nsplicing<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":[7,8,9]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script></p>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Dmitrii Smirnov" />
+
+<meta name="date" content="2021-07-05" />
+
+<title>Overview of variants used for OddsPath calculation</title>
+
+<script src="libR/header-attrs-2.8/header-attrs.js"></script>
+<script src="libR/jquery-1.12.4/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="libR/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="libR/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="libR/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="libR/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="libR/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="libR/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="libR/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="libR/navigation-1.1/tabsets.js"></script>
+<script src="libR/navigation-1.1/codefolding.js"></script>
+<script src="libR/navigation-1.1/sourceembed.js"></script>
+<link href="libR/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="libR/highlightjs-9.12.0/highlight.js"></script>
+<script src="libR/htmlwidgets-1.5.1/htmlwidgets.js"></script>
+<link href="libR/datatables-css-0.0.0/datatables-crosstalk.css" rel="stylesheet" />
+<script src="libR/datatables-binding-0.15/datatables.js"></script>
+<link href="libR/dt-core-1.10.20/css/jquery.dataTables.min.css" rel="stylesheet" />
+<link href="libR/dt-core-1.10.20/css/jquery.dataTables.extra.css" rel="stylesheet" />
+<script src="libR/dt-core-1.10.20/js/jquery.dataTables.min.js"></script>
+<link href="libR/crosstalk-1.1.0.1/css/crosstalk.css" rel="stylesheet" />
+<script src="libR/crosstalk-1.1.0.1/js/crosstalk.min.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+#rmd-source-code {
+  display: none;
+}
+</style>
+
+
+<link rel="stylesheet" href="lib/add_content_table.css" type="text/css" />
+<link rel="stylesheet" href="lib/leo_style.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div id="header">
+
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+<li role="separator" class="divider"></li>
+<li><a id="rmd-download-source" href="#">Download Rmd</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Overview of variants used for OddsPath calculation</h1>
+<h4 class="author">Dmitrii Smirnov</h4>
+<h4 class="date">2021-07-05</h4>
+
+</div>
+
+
+<pre class="r"><code>source(snakemake@input$config)
+# source(&#39;src/config.R&#39;)
+
+vt_PBC &lt;- fread(&quot;data/pathogenic_benign_variants.tsv&quot;)
+
+
+
+# Read OUTRIDER
+out &lt;- readRDS(&quot;../Variant_interpretation_RNA/OUTRIDER_results_all.Rds&quot;) %&gt;% as.data.table()
+out &lt;- out[, c(&quot;sampleID&quot;, &quot;geneID&quot;, &quot;zScore&quot;, &quot;FC&quot;, &quot;pValue&quot;, &quot;padjust&quot;)]
+setnames(out, c( &quot;sampleID&quot;, &quot;zScore&quot;, &quot;FC&quot;, &quot;pValue&quot;, &quot;padjust&quot;), 
+         c( &quot;RNA_ID&quot;, &quot;AE_zScore&quot;, &quot;AE_FC&quot;, &quot;AE_PVALUE&quot;, &quot;AE_PADJ&quot; ))
+out[ ,geneID := toupper(geneID) ]
+
+
+# Combine variants and expression
+vt_PBC &lt;- vt_PBC[RNA_ID %in% unique(out$RNA_ID)]
+vt_PBC &lt;- vt_PBC[!is.na(var_type)]
+
+out &lt;- out[RNA_ID %in% vt_PBC$RNA_ID ]
+out &lt;- out[geneID %in% unique(vt_PBC$geneID) ]
+
+vto &lt;- merge(vt_PBC, out, by = c(&quot;RNA_ID&quot;, &quot;geneID&quot;))</code></pre>
+<div id="variant-summary" class="section level1">
+<h1>Variant summary</h1>
+<p>For calculation of the odds of pathogenicity (OddsPath), data from 130 genetically diagnosed individuals from Yepez et al. 2021 study was used.</p>
+<pre class="r"><code>DT::datatable(table(vto[, .(var_type, Pathogenicity)]),   escape = F)</code></pre>
+<div id="htmlwidget-50e3a00ed67d0fdcec94" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-50e3a00ed67d0fdcec94">{"x":{"filter":"none","data":[["Coding","Non-coding","PTV","Splice","Coding","Non-coding","PTV","Splice"],["Coding","Non-coding","PTV","Splice","Coding","Non-coding","PTV","Splice"],["Benign","Benign","Benign","Benign","Pathogenic","Pathogenic","Pathogenic","Pathogenic"],[107,56,306,126,82,18,45,11]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>var_type<\/th>\n      <th>Pathogenicity<\/th>\n      <th>Freq<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":[1,2]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<pre class="r"><code># nrow(vto[Pathogenicity == &quot;Benign&quot;]) # 303
+
+# uniqueN(vto$RNA_ID) #130
+# uniqueN(vto[Pathogenicity == &quot;Pathogenic&quot;]$RNA_ID) #119
+
+# uniqueN(vto$geneID) #243
+# uniqueN(vto[Pathogenicity == &quot;Pathogenic&quot;]$geneID) # 99
+# nrow(vto[Pathogenicity == &quot;Pathogenic&quot;]) #156
+# nrow(vto[Pathogenicity == &quot;Benign&quot;]) #156</code></pre>
+</div>
+<div id="pathogenic-variants" class="section level1">
+<h1>Pathogenic variants</h1>
+<pre class="r"><code>#vtp &lt;- fread(&quot;data/pathogenic_variants.tsv&quot;)
+sa &lt;- fread(&quot;data/sample_annotation.tsv&quot;)
+sa &lt;- sa[, c(&quot;KNOWN_MUTATION&quot;, &quot;VARIANT_INFO&quot;,  &quot;VARIANT_EFFECT&quot;,   &quot;gt&quot;)]
+setnames(sa, c(&quot;Causal gene&quot;, &quot;Variants&quot;,  &quot;Variant effect&quot;,   &quot;Genotype&quot;) )
+
+DT::datatable(sa, caption = &quot;Pathogenic variants&quot;,   escape = F)</code></pre>
+<div id="htmlwidget-2a581c37bd5488687210" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-2a581c37bd5488687210">{"x":{"filter":"none","caption":"<caption>Pathogenic variants<\/caption>","data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","37","38","39","40","41","42","43","44","45","46","47","48","49","50","51","52","53","54","55","56","57","58","59","60","61","62","63","64","65","66","67","68","69","70","71","72","73","74","75","76","77","78","79","80","81","82","83","84","85","86","87","88","89","90","91","92","93","94","95","96","97","98","99","100","101","102","103","104","105","106","107","108","109","110","111","112","113","114","115","116","117","118","119","120","121","122","123","124","125","126","127","128","129","130"],["NDUFS8","TIMMDC1","GTPBP3","FBXL4","TRMU","SLC25A10","ELAC2","NDUFB3","CLPP","MT-ND3","MGME1","MT-ND1","DNAJC3","DNAJC3","ELAC2","PRPS1","NDUFA10","MCOLN1","SBDS","TIMMDC1","MT-ND5","PC","GAMT","CDKL5","ACAD9","NDUFAF5","LYRM7","SQSTM1","LRPPRC","LPIN1","CCDC40","NBAS","IARS","TAZ","DICER1","NBAS","NBAS","NSUN3","EPG5","PURA","C1QBP","GPD1","ALDH18A1","UNC80","TXN2","TALDO1","PPA2","PPA2","TANGO2","FBXL4","SFXN4","NDUFS4","FDXR","GFER","ADPRHL2","CYP4X1","BCS1L","SLC19A1","SCN1A","SLC25A42","PPCS","ETFDH","KCNA2","HMGCS2","MRPL44","AP4B1","GNAO1","FDXR","CHD1","VPS33B","ADPRHL2","SELENON","YARS","ACAD9","RDH11","LIG3","NDUFA10","CLPB","F11","MT-ND6","DGUOK","MT-ND6","YME1L1","C19ORF70","DARS2","DNAJC30","NDUFAF5","MT-ND5","MRPL38","NFU1","MORC2","SLC25A4","TIMMDC1","CTR2","NDUFB11","SON","DLD","SSBP1","TWNK","TXNIP","DNAJC30","G6PD","GMPPB","RNF170","MED23","ASCC1","MEPCE","NAXE","RRM2B","CLDN11","DLD","TXNIP","TSFM","SUCLA2","FOXRED1","FH","EARS2","MRPS34","MRPS25","NDUFB11","STIM1","TRMT5","MT-TL1","UQCRFS1","NBAS","PEX1","STT3A","UFM1","ATP6AP1","PTCD3"],["c.229C>T; c.476C>A","c.596+2146A>G, p.Gly199_Thr200ins5*","c.1228dupC; c.1312G>A","c.1652T>A","c.835G>A","c.304A>T, p.Lys102*; c.574C>T, p.Pro192Ser","c.1559C>T; c.631C>T","c.64T>C; c.208G>T","c.661G>A; p.Glu221Lys","c.139G>A","c.456G>A, p.Trp152*","c.199A>G","c.580C>T, p.Arg194*","c.580C>T, p.Arg194*","c.460T>C","c.383A>T","c.-99_-75delACCCCGGCCGTGACGTCACGGCAGC, p.?","c.681-19A>C, p. Lys227_Leu228ins16*; c.832C>T, p.Gln278*","c.258+2T>C, p.Cys84Tyrfs*4","c.596+2146A>G, p.Gly199_Thr200ins5*","c.1177G>A","c.1891C>T; c.1217G>A","c.522G>A, p.Trp174*","c.2528delT","c.1690G>A; c.1832A>G","c.223-907A>C, c.604_605insA","c.52delA","c.2T>A","c.2595_2597delGGT","c.2550-865_2667-34del","c.1025A>G; c.2824_2825insCTGT","c.558_560delGAT, p.Ile187del;c.686dupT, p.Ser230Glnfs*4","c.3521T>A, p.Ile1174Asn; c.1252C>T, p.Arg418*","c.348C>T, p.Gly116_Arg123del","c.4295C>T; c.760G>A","c.2708T>G","c.3164T>C, p.Leu1055Pro;c.3010C>T, p.Arg1004*","3kbp del; c.295C>T, p.Arg99*","c.5548T>C","c.629dupG","c.823C>T","c.1982C>A, p.Ser661* ;c.1858TC>T.p.Arg620Trp","c.1982C>A; c.1858C>T","c.7214C>A; c.1806G>C","c.71G>A","c.345dupA, p.Asp116Argfs*80","c.500C>T","c.500C>T","c.4delT, p.Cys2Alafs*35; c.56þ1_57-1_(*1_?)del","uc003ppf.1,FBXL4,-,662T->A,1,non-syn,Asp221Val:","c.739dupA, p.Arg247Lysfs*19; c.471+1G>A, p.Thr158Metfs∗38","c.466_469dupAAGT, p.Ser157*","uc010wri.2,FDXR,-,527C->A,1,non-syn,Arg176Leu; uc010wrk.2,FDXR,-,35G->C,1,non-syn,Ser12Trp:","uc002cob.3,GFER,+,197_197delC (p.Arg67Glyfs*83),1,frame-shift,2034415,-C,del: uc002cob.3,GFER,+,586C->T,0,non-syn,Arg196Cys:","c.[1004T>G];[1004T>G] n.d.;p.[Val335Gly];[Val335Gly]","heterozygous uc001cqt.3,CYP4X1,+,136T->C,0,non-syn,Phe46Leu: and uc001cqt.3,CYP4X1,+,137T->C,1,non-syn,Phe46Ser:","uc002vis.4,BCS1L,+,296C->T,1,non-syn,Pro99Leu:","uc010gpy.1,SLC19A1,-,1579C->T,0,non-syn,Gly527Ser: ;uc010gpy.1,SLC19A1,-,1525C->T,0,non-syn,Glu509Lys:","uc010fpk.3,SCN1A,-,707A->G,1,non-syn,Ile236Thr:","c.380+2T>A, p.Ala128*","uc001chl.3,PPCS,+,319_333delCCTTCGGGCCCAGCC,0,del_5aa;uc001chl.3,PPCS,+,538G->C,0,non-syn,Ala180Pro: uc001chk.3","uc003iqb.3,ETFDH,+,687_688delAA,2,frame-shift,159616650,-AA,del: uc003iqb.3","uc009wfv.2,KCNA2,-,881C->T,1,non-syn,Arg294His:","uc021osx.1,HMGCS2,-,310C->G,0,non-syn,Asp104His:","uc002vnr.4,MRPL44,+,A->G,near splicesite","c.1216C>T, p.Arg406*","uc002eit.4,GNAO1,+,709G->A,0,non-syn,Glu237Lys:","uc010wri.2,FDXR,-,902C->T,1,non-syn,Cys301Tyr: , uc010wri.2,FDXR,-,527C->A,1,non-syn,Arg176Leu:","c.184_187delTCAG, p.Glu63Leufs*185","c.1236delC, p.Lys413Argfs*6","uc001bzt.3,ADPRHL2,+,1004T->G,1,non-syn,Val335Gly:","c.713dupA, p.Asn238Lysfs*?; c.1397G->A, p.Arg466Gln:","uc001bvy.1,YARS,-,176A->G,1,non-syn,Ile59Thr:","uc003ela.4,ACAD9,+,1A->G,0,non-syn,Met1Val: uc003ela.4,ACAD9,+,261T->G,2,non-syn,Ile87Met:","c.[637A>C], p.[Thr213Pro]","c.86G>A, p.Trp29*; c.1611+208G>A, p.?","c.-99_-75delACCCCGGCCGTGACGTCACGGCAGC, p.?","uc001osi.3,CLPB,-,502C->T,0,non-syn,Gly168Arg:","uc003iza.1,F11,+,730C->T,0,non-syn,Gln244Stop:","14453G<A","c.353G>T, p.Arg118Leu; cnv","14453G<A","c.616C>T","c.143delT, p.Val48Alafs*42, c.29+272G>C, p.Phe11Trpfs*5","c.492+2T>C, p.Lys133_Lys164del, c.228-12C>G, p.?, c.228-20T>C, p.?","c.152A>G","c.223-907A>C, p.Glu74_Val75ins19*; c.604_605insA, p.Leu203Valfs*22","m.13094T>C","c.770C>G, p.Pro257Arg, c.1-174del127, p.?","c.362T>C, p.Val121Ala; CNV","c.77C>T, p.Ala26Val","c.598G>A, p.Gly200Arg","c.596+2146A>G, p.Gly199_Thr200ins5*","","","c.5753_5756delTTAG, p.Val1918Glufs*87","c.685G>T, p.Gly229Cys; c.1046+5G>T, p.Ile293_Asn349del","c.394A>G","c.1302C>G, p.416Gfs*7","uc001enn.4,TXNIP,+,642_643insT,0,frame-shift,145440336,+T,ins:","c.152A>G","c.961G>A; p.Val321Met","c.1016_1017insGCCTT","17 kb deletion of first 5 exons","c.3734dupT, p.Leu1245Phefs*32; c.635T>C, p.Phe212Ser","c.574-1471_831-5742del24223","c.1552 C> T, p.Arg518*","c.292-12C>G, p.?","c.328C>T, p.Arg110Cys; chr8:103160286 C>T, p.?","c.370T>C","c.685G>T, p.Gly229Cys","c.257dupA; p.Asn86LysfsTer2","c.997C>T","c.985A>G; c.850C>T","c.406C>T","c.1048C>T","c.911C>A","c.62T>C","c.327+75G>A, p.Glu110_Glu111ins*","c.349T>C","c.326A>G","c.697A>G; c.433A>G","chrM:3243 A>G","c.215-1G>C, p.Val72_Thr81del10","c.3164T>C; c.603_605delCCT","c.1842delA, p.Glu615Lysfs*30; c.1240-1551A>G, p.Trp413_Ile414ins11*","c.137A>G","c.1-273_271delTCA, p.?","chrX:153659943C>T","c.1435-1G>C; c.1918C>G"],["missense; missense","intronic","frameshift; missense","missense","missense","stop; missense","missense; stop","missense; stop","missense","missense","stop","missense","stop","stop","missense","missense","5UTR","intronic; stop","splice_donor","intronic","missense","missense; missense","stop","frameshift","missense; missense","intronic; insertion","frameshift","start_loss","indel","deletion (1759 bp)","missense; frameshift","indel; frameshift","missense; stop","synonymous","missense; missense","missense","missense; stop","deletion; stop","missense","frameshift","missense","missense","stop; missense","missense; missense","stop","frameshift","missense","missense","frameshift; cnv","missense","frameshift; splicesite","frameshift","missense; missense","frame-shift; missense","missense","missense; missense","missense","missense; missense","missense","splicesite","del; missense","frameshift","missense","missense","near splicesite","stop","missense","missense; missense","frameshift","frameshift","missense","frameshift; missense","missense","missense; missense","missense","stop; intron","5UTR","missense","stop","missense","missense; deletion","missense","missense","frameshift; intronic","splice; intronic","missense","startloss; intronic","missense","missense; 5UTR deletion","missense; deletion","missense","splice","intronic","missense; missense","missense","frameshift","missense; splice region","missense","synonymous","frameshift; frameshift","missense","missense","frameshift","cnv","frameshift; missense","cnv","stop","intronic","missense; intergenic","stoploss de novo","missense; ?","frameshift","missense","missense; missense","missense","missense","missense","missense","intronic","missense","missense","missense; missense","missense","splicesite","missense; del","frameshift; intronic","missense","deletion","intronic","splice_acceptor; missense"],["compound\nheterozygous","homozygous","compound\nheterozygous","homozygous","homozygous","compound\nheterozygous","compound\nheterozygous","compound\nheterozygous","homozygous","homozygous","homozygous","homozygous","homozygous","homozygous","homozygous","heterozygous","homozygous","compound\nheterozygous","homozygous","homozygous","homozygous","compound\nheterozygous","homozygous","heterozygous","compound\nheterozygous","compound\nheterozygous","homozygous","homozygous","homozygous","homozygous","compound\nheterozygous","compound\nheterozygous","compound\nheterozygous","homozygous","compound\nheterozygous","homozygous","compound\nheterozygous","compound\nheterozygous","homozygous","heterozygous","homozygous","homozygous","compound\nheterozygous","compound\nheterozygous","homozygous","homozygous","homozygous","homozygous","compound\nheterozygous","homozygous","compound\nheterozygous","homozygous","compound\nheterozygous","compound\nheterozygous","homozygous","compound\nheterozygous","homozygous","compound\nheterozygous","heterozygous","homozygous","compound\nheterozygous","heterozygous","heterozygous","homozygous","homozygous","homozygous","heterozygous","compound\nheterozygous","heterozygous","homozygous","homozygous","compound\nheterozygous","homozygous","compound\nheterozygous","homozygous","compound\nheterozygous","homozygous","heterozygous","heterozygous","heterozygous","compound\nheterozygous","heterozygous","homozygous","compound\nheterozygous","compound\nheterozygous","homozygous","compound\nheterozygous","heterozygous","compound\nheterozygous","compound\nheterozygous","heterozygous","homozygous","homozygous","compound\nheterozygous","homozygous","heterozygous","compound\nheterozygous","homozygous","homozygous","compound\nheterozygous","homozygous","heterozygous","homozygous","homozygous","compound\nheterozygous","homozygous","heterozygous","homozygous","compound\nheterozygous","heterozygous","compound\nheterozygous","homozygous","homozygous","compound\nheterozygous","homozygous","homozygous","compound\nheterozygous","homozygous","homozygous","homozygous","heterozygous","compound\nheterozygous","heterozygous","homozygous","compound\nheterozygous","compound\nheterozygous","heterozygous","homozygous","heterozygous","compound\nheterozygous"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Causal gene<\/th>\n      <th>Variants<\/th>\n      <th>Variant effect<\/th>\n      <th>Genotype<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"order":[],"autoWidth":false,"orderClasses":false,"columnDefs":[{"orderable":false,"targets":0}]}},"evals":[],"jsHooks":[]}</script>
+</div>
+
+<div id="rmd-source-code">IyctLS0KIycgdGl0bGU6IE92ZXJ2aWV3IG9mIHZhcmlhbnRzIHVzZWQgZm9yIE9kZHNQYXRoIGNhbGN1bGF0aW9uIAojJyBhdXRob3I6IERtaXRyaWkgU21pcm5vdgojJyB3YjoKIycgIGlucHV0OgojJyAgLSBjb25maWc6ICdzcmMvY29uZmlnLlInCiMnICAtIHNhOiAnYHNtIGNvbmZpZ1siUk5BX0FOTk9UQVRJT04iXWAnCiMnICBvdXRwdXQ6CiMnIG91dHB1dDogCiMnICAgaHRtbF9kb2N1bWVudDoKIycgICAgY29kZV9mb2xkaW5nOiBoaWRlCiMnICAgIGNvZGVfZG93bmxvYWQ6IFRSVUUKIyctLS0KCgpzb3VyY2Uoc25ha2VtYWtlQGlucHV0JGNvbmZpZykKIyBzb3VyY2UoJ3NyYy9jb25maWcuUicpCgp2dF9QQkMgPC0gZnJlYWQoImRhdGEvcGF0aG9nZW5pY19iZW5pZ25fdmFyaWFudHMudHN2IikKCgoKIyBSZWFkIE9VVFJJREVSCm91dCA8LSByZWFkUkRTKCIuLi9WYXJpYW50X2ludGVycHJldGF0aW9uX1JOQS9PVVRSSURFUl9yZXN1bHRzX2FsbC5SZHMiKSAlPiUgYXMuZGF0YS50YWJsZSgpCm91dCA8LSBvdXRbLCBjKCJzYW1wbGVJRCIsICJnZW5lSUQiLCAielNjb3JlIiwgIkZDIiwgInBWYWx1ZSIsICJwYWRqdXN0IildCnNldG5hbWVzKG91dCwgYyggInNhbXBsZUlEIiwgInpTY29yZSIsICJGQyIsICJwVmFsdWUiLCAicGFkanVzdCIpLCAKICAgICAgICAgYyggIlJOQV9JRCIsICJBRV96U2NvcmUiLCAiQUVfRkMiLCAiQUVfUFZBTFVFIiwgIkFFX1BBREoiICkpCm91dFsgLGdlbmVJRCA6PSB0b3VwcGVyKGdlbmVJRCkgXQoKCiMgQ29tYmluZSB2YXJpYW50cyBhbmQgZXhwcmVzc2lvbgp2dF9QQkMgPC0gdnRfUEJDW1JOQV9JRCAlaW4lIHVuaXF1ZShvdXQkUk5BX0lEKV0KdnRfUEJDIDwtIHZ0X1BCQ1shaXMubmEodmFyX3R5cGUpXQoKb3V0IDwtIG91dFtSTkFfSUQgJWluJSB2dF9QQkMkUk5BX0lEIF0Kb3V0IDwtIG91dFtnZW5lSUQgJWluJSB1bmlxdWUodnRfUEJDJGdlbmVJRCkgXQoKdnRvIDwtIG1lcmdlKHZ0X1BCQywgb3V0LCBieSA9IGMoIlJOQV9JRCIsICJnZW5lSUQiKSkKCiMnICMgVmFyaWFudCBzdW1tYXJ5CgojJyBGb3IgY2FsY3VsYXRpb24gb2YgdGhlIG9kZHMgb2YgcGF0aG9nZW5pY2l0eSAoT2Rkc1BhdGgpLCBkYXRhIGZyb20gMTMwIGdlbmV0aWNhbGx5IGRpYWdub3NlZCBpbmRpdmlkdWFscyBmcm9tIFllcGV6IGV0IGFsLiAyMDIxIHN0dWR5IHdhcyB1c2VkLgojJyAKCkRUOjpkYXRhdGFibGUodGFibGUodnRvWywgLih2YXJfdHlwZSwgUGF0aG9nZW5pY2l0eSldKSwgICBlc2NhcGUgPSBGKQoKCgojIG5yb3codnRvW1BhdGhvZ2VuaWNpdHkgPT0gIkJlbmlnbiJdKSAjIDMwMwoKIyB1bmlxdWVOKHZ0byRSTkFfSUQpICMxMzAKIyB1bmlxdWVOKHZ0b1tQYXRob2dlbmljaXR5ID09ICJQYXRob2dlbmljIl0kUk5BX0lEKSAjMTE5CgojIHVuaXF1ZU4odnRvJGdlbmVJRCkgIzI0MwojIHVuaXF1ZU4odnRvW1BhdGhvZ2VuaWNpdHkgPT0gIlBhdGhvZ2VuaWMiXSRnZW5lSUQpICMgOTkKIyBucm93KHZ0b1tQYXRob2dlbmljaXR5ID09ICJQYXRob2dlbmljIl0pICMxNTYKIyBucm93KHZ0b1tQYXRob2dlbmljaXR5ID09ICJCZW5pZ24iXSkgIzE1NgoKCiMnICMgUGF0aG9nZW5pYyB2YXJpYW50cyAKCiN2dHAgPC0gZnJlYWQoImRhdGEvcGF0aG9nZW5pY192YXJpYW50cy50c3YiKQpzYSA8LSBmcmVhZCgiZGF0YS9zYW1wbGVfYW5ub3RhdGlvbi50c3YiKQpzYSA8LSBzYVssIGMoIktOT1dOX01VVEFUSU9OIiwgIlZBUklBTlRfSU5GTyIsICAiVkFSSUFOVF9FRkZFQ1QiLCAgICJndCIpXQpzZXRuYW1lcyhzYSwgYygiQ2F1c2FsIGdlbmUiLCAiVmFyaWFudHMiLCAgIlZhcmlhbnQgZWZmZWN0IiwgICAiR2Vub3R5cGUiKSApCgpEVDo6ZGF0YXRhYmxlKHNhLCBjYXB0aW9uID0gIlBhdGhvZ2VuaWMgdmFyaWFudHMiLCAgIGVzY2FwZSA9IEYpCgoKCg==</div>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeSourceEmbed("Variant_information.R");
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

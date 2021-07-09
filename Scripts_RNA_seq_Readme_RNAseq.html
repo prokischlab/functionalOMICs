@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Dmitrii Smirnov" />
+
+<meta name="date" content="2021-07-05" />
+
+<title>Overview of RNA-seq studies and data used for OddsPath</title>
+
+<script src="libR/header-attrs-2.8/header-attrs.js"></script>
+<script src="libR/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="libR/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="libR/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="libR/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="libR/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="libR/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="libR/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="libR/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="libR/navigation-1.1/tabsets.js"></script>
+<script src="libR/navigation-1.1/codefolding.js"></script>
+<script src="libR/navigation-1.1/sourceembed.js"></script>
+<link href="libR/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="libR/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+#rmd-source-code {
+  display: none;
+}
+</style>
+
+
+<link rel="stylesheet" href="lib/add_content_table.css" type="text/css" />
+<link rel="stylesheet" href="lib/leo_style.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div id="header">
+
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+<li role="separator" class="divider"></li>
+<li><a id="rmd-download-source" href="#">Download Rmd</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Overview of RNA-seq studies and data used for OddsPath</h1>
+<h4 class="author">Dmitrii Smirnov</h4>
+<h4 class="date">2021-07-05</h4>
+
+</div>
+
+
+<pre class="r"><code>source(snakemake@input$config)
+# source(&#39;src/config.R&#39;)
+
+
+##############################################
+################ Studies overview ############
+##############################################</code></pre>
+<div id="diagnostic-rates-in-the-rna-seq-studies" class="section level1">
+<h1>Diagnostic rates in the RNA-seq studies</h1>
+<pre class="r"><code>studies_df = data.table(
+  ID = c(&quot;Kremer et al. 2017&quot;,&quot;Cummings et al. 2017&quot;,&quot;Gonorazky et al. 2019&quot;,
+         &quot;Frésard et al. 2019&quot;,&quot;Lee et al. 2020&quot;,&quot;Rentas et al. 2020&quot;, 
+         &quot;Murdock et al. 2020&quot;, &quot;Maddirevula et al. 2020&quot;, &quot;Kopajtich et al., 2021&quot;, &quot;Yepez et al., 2021&quot;, &quot;&quot;),
+  Affected_individuals = c(105, 63, 29, 94, 48, 15, 115, 11, 145, 303, 0),
+  Undiagnosed_individuals = c(48, 50, 25, 80, 48, 5, 83, 11, 121, 205, 0 ),
+  Diagnosed_individuals = c(5, 17, 9, 6, 7, 2, 14, 6, 13, 33, 0) )
+studies_df[ , Diagnostic_rate :=  Diagnosed_individuals  /  Undiagnosed_individuals]
+studies_df[Undiagnosed_individuals == 0 , Diagnostic_rate :=  0]
+
+studies_df &lt;- studies_df[ !(ID %in% c(&quot;Rentas et al. 2020&quot;,  &quot;Maddirevula et al. 2020&quot;))]
+
+studies_df &lt;- studies_df[order(Undiagnosed_individuals)]
+studies_df$ID &lt;- factor(studies_df$ID, levels = studies_df$ID  )
+
+
+
+
+p1 &lt;- ggplot(studies_df[ID != &quot;&quot;], aes(Undiagnosed_individuals, Diagnostic_rate) )+ # , size =  Diagnosed_individuals
+  geom_point(aes(fill = ID), shape = 21, size = 5.5) +
+  scale_fill_ptol(guide = guide_legend(override.aes = list(shape = 21, size = 3.5)))+
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+  ylab(&quot;Validation + discovery rate&quot;) + 
+  xlab(&quot;N genetically unsolved individuals&quot;) +
+  labs(fill = &quot;Study&quot;)+  #, size = &quot;N diagnosed individuals&quot;
+  theme_classic()+
+  #scale_size(range = c(3,8))+
+  theme(axis.title.y= element_text( size=12,  face=&quot;bold&quot;),
+        axis.title.x= element_text( size=12,  face=&quot;bold&quot;),
+        axis.text.x = element_text(face=&quot;bold&quot;,  size=12),
+        axis.text.y= element_text(face=&quot;bold&quot;,  size=12),
+        legend.position = c(0.8, 0.7))
+
+
+
+
+
+m &lt;- lm(Diagnosed_individuals ~ Undiagnosed_individuals, studies_df )
+eq &lt;- substitute(italic(y) == a + b %.% italic(x)*&quot;,&quot;~~italic(r)^2~&quot;=&quot;~r2, 
+                 list(a = format(unname(coef(m)[1]), digits = 2),
+                      b = format(unname(coef(m)[2]), digits = 2),
+                      r2 = format(summary(m)$r.squared, digits = 3)))
+
+
+
+
+
+
+p1_2 &lt;- ggplot(studies_df[ID != &quot;&quot;], aes(Undiagnosed_individuals, Diagnosed_individuals) )+ # , size =  Diagnosed_individuals
+  geom_point(aes(fill = ID), shape = 21, size = 5.5) +
+  scale_fill_ptol(guide = guide_legend(override.aes = list(shape = 21, size = 3.5)))+
+  geom_smooth(method=&#39;lm&#39;, colour=&quot;grey50&quot;, se = FALSE)+
+  ylab(&quot;Diagnosed cases by RNA-seq&quot;) + 
+  xlab(&quot;Analysed unsolved individuals&quot;) +
+  labs(fill = &quot;Study&quot;)+  #, size = &quot;N diagnosed individuals&quot;
+  theme_classic()+
+  #scale_size(range = c(3,8))+
+  expand_limits(x = 0, y = 0) +
+  theme(axis.title.y= element_text( size=12,  face=&quot;bold&quot;),
+        axis.title.x= element_text( size=12,  face=&quot;bold&quot;),
+        axis.text.x = element_text(face=&quot;bold&quot;,  size=12),
+        axis.text.y= element_text(face=&quot;bold&quot;,  size=12))
+p1_2 &lt;- p1_2 + geom_text(x =100, y = 30, label = as.character(as.expression(eq)), parse = TRUE)</code></pre>
+<pre class="r"><code>p1 | p1_2</code></pre>
+<p><img src="Scripts_RNA_seq_Readme_RNAseq_files/figure-html/unnamed-chunk-3-1.png" width="1056" /></p>
+<pre class="r"><code>######################################################################
+################ Genetic diagnosis in the RNA-seq studies ############
+######################################################################</code></pre>
+</div>
+<div id="genetic-diagnosis-in-the-rna-seq-studies" class="section level1">
+<h1>Genetic diagnosis in the RNA-seq studies</h1>
+<pre class="r"><code>cases_df = fread(&quot;../Variant_interpretation_RNA/RNA_studies_variant_interpretation.csv&quot;)
+cases_df &lt;- cases_df[ !(Study %in% c(&quot;Rentas et al. 2020&quot;,  &quot;Maddirevula et al. 2020&quot;))]
+
+cases_df[Study ==  &quot;Cummings et al. 2017&quot; &amp; CaseID == &quot;E2&quot;, Variant_effect := &quot;splice; splice&quot;] 
+cases_df[Study ==  &quot;Cummings et al. 2017&quot; &amp; CaseID == &quot;E2&quot;, MAE := 1] 
+
+cases_df[Study ==  &quot;Cummings et al. 2017&quot; &amp; CaseID == &quot;C9&quot;, MAE := 1]
+cases_df[Study ==  &quot;Cummings et al. 2017&quot; &amp; CaseID == &quot;N25&quot;, MAE := 1]
+cases_df[Study ==  &quot;Cummings et al. 2017&quot; &amp; CaseID == &quot;N22&quot;, MAE := 1]
+
+
+cases_df_s &lt;- cases_df[Splicing_only == &quot;No&quot;]
+cases_df_s[ , outlier := &quot;No&quot;]
+cases_df_s[ AE == 1, outlier := &quot;AE&quot;]
+cases_df_s[ AS == 1, outlier := &quot;AS&quot;]
+cases_df_s[ MAE == 1, outlier := &quot;MAE&quot;]
+cases_df_s[ AE == 1 &amp; AS == 1, outlier := &quot;AE + AS&quot;]
+cases_df_s[ AE == 1 &amp; MAE == 1, outlier := &quot;AE + MAE&quot;]
+cases_df_s[ AE == 1 &amp; AS == 1 &amp; MAE == 1, outlier := &quot;AE + AS + MAE&quot;]
+
+cases_df[, c(&quot;Variant1&quot;, &quot;Variant2&quot;) := tstrsplit(Variant_effect, &quot;; &quot;, fixed=TRUE)]
+cases_df[ is.na(Variant2) &amp; Alleles == 2, Variant2 := Variant1]
+
+cases_df[, comp_het := Variant_effect %like% &quot;;&quot;]
+
+df &lt;- cases_df[comp_het == T | Alleles == 1 ]
+
+
+
+df &lt;- cases_df[comp_het == F]
+df &lt;- df[, .N, by = Variant_effect]
+df[ , Total := sum(N)]
+df[ , perc := N/Total]
+df &lt;- df[order(N, decreasing = T)]
+
+
+cases_df[, st_case := paste0(Study, &quot;_&quot;, CaseID )]
+cases_var1 &lt;- cases_df[ , c(&quot;st_case&quot;, &quot;Variant1&quot;, &quot;AE&quot;, &quot;AS&quot;, &quot;MAE&quot; )]
+setnames(cases_var1, c(&quot;Variant1&quot;), c(&quot;Variant&quot;))
+cases_var2 &lt;- cases_df[ , c(&quot;st_case&quot;, &quot;Variant2&quot;, &quot;AE&quot;, &quot;AS&quot;, &quot;MAE&quot; )]
+cases_var2 &lt;- cases_var2[!is.na(Variant2)]
+cases_var2[st_case ==  &quot;Cummings et al. 2017_E2&quot; &amp; Variant2 == &quot;splice&quot;, MAE := 0] 
+
+setnames(cases_var2, c(&quot;Variant2&quot;), c(&quot;Variant&quot;))
+cases_var &lt;- rbind(cases_var1, cases_var2)
+rm(cases_var1, cases_var2)
+cases_var[Variant == &quot;inonsense&quot;,  Variant := &quot;nonsense&quot;]
+
+cases_var &lt;- cases_var[st_case !=  &quot;Gonorazky et al. 2019_Case6&quot;]
+cases_var &lt;- cases_var[st_case !=  &quot;Yepez et al., 2021_R77611&quot;]
+
+
+cases_var[st_case ==  &quot;Cummings et al. 2017_C9&quot; &amp; Variant == &quot;splice&quot;, MAE := 0]
+cases_var[st_case ==  &quot;Cummings et al. 2017_N25&quot; &amp; Variant == &quot;intronic&quot;, MAE := 0]
+cases_var[st_case ==  &quot;Cummings et al. 2017_N22&quot; &amp; Variant == &quot;missense&quot;, MAE := 0]
+
+
+cases_var[st_case ==  &quot;Gonorazky et al. 2019_Case15&quot; &amp; Variant == &quot;missense&quot;, MAE := 0]
+cases_var[st_case ==  &quot;Gonorazky et al. 2019_Case17&quot; &amp; Variant == &quot;missense&quot;, MAE := 0]
+cases_var[st_case ==  &quot;Yepez et al., 2021_R74065&quot; &amp; Variant == &quot;synonymous&quot;, MAE := 0]
+cases_var[st_case ==  &quot;Yepez et al., 2021_R77365&quot; &amp; Variant == &quot;missense&quot;, MAE := 0]
+cases_var[st_case ==  &quot;Yepez et al., 2021_R21470&quot; &amp; Variant == &quot;splice&quot;, MAE := 0]
+#cases_var[st_case ==  &quot;Yepez et al., 2021_R11285&quot; &amp; Variant == &quot;missense&quot;, MAE := 0]
+cases_var[st_case ==  &quot;Yepez et al., 2021_R11258&quot; &amp; Variant == &quot;missense&quot;, MAE := 0]
+
+cases_var[st_case ==  &quot;Yepez et al., 2021_R26710&quot; &amp; Variant == &quot;missense&quot;, MAE := 0]
+cases_var[st_case ==  &quot;Yepez et al., 2021_R29620&quot; &amp; Variant == &quot;missense&quot;, MAE := 0]
+cases_var[st_case ==  &quot;Yepez et al., 2021_R80184&quot; &amp; Variant == &quot;missense&quot;, MAE := 0]
+cases_var[st_case ==  &quot;Yepez et al., 2021_R89912&quot; &amp; Variant == &quot;missense&quot;, MAE := 0]
+#cases_var[st_case ==  &quot;Yepez et al., 2021_R77611&quot; &amp; Variant == &quot;missense&quot;, MAE := 0]
+cases_var[st_case ==  &quot;Yepez et al., 2021_R24289&quot; &amp; Variant == &quot;missense&quot;, MAE := 0]
+
+
+# Group variants
+cases_var[Variant == &quot;intergenic&quot;, Variant := &quot;intronic&quot; ]
+cases_var[Variant == &quot;5UTR&quot;, Variant := &quot;UTR&quot; ]
+cases_var[Variant %in% c(&quot;UTR&quot;, &quot;promoter&quot;, &quot;indel&quot;, &quot;start-loss&quot;), Variant := &quot;Other&quot; ]
+
+
+Nalleles &lt;- nrow(cases_var)
+
+Nalleles_per_vt &lt;- cases_var[ , .N, by = Variant]
+setnames(Nalleles_per_vt, &quot;N&quot;, &quot;Total_a_vt&quot;)
+
+cases_var_AE &lt;- cases_var[, sum(AE, na.rm = T), by = &quot;Variant&quot;]
+cases_var_AE[, phenotype := &quot;Aberrant expression&quot;]
+
+cases_var_AS &lt;- cases_var[, sum(AS, na.rm = T), by = &quot;Variant&quot;]
+cases_var_AS[, phenotype := &quot;Aberrant splicing&quot;]
+
+cases_var_MAE &lt;- cases_var[, sum(MAE, na.rm = T), by = &quot;Variant&quot;]
+cases_var_MAE[, phenotype := &quot;Mono-allelic expression&quot;]
+
+
+cases_var[ , Combined := 0]
+cases_var[ AE == 1, Combined := 1]
+cases_var[ AS == 1, Combined := 1]
+cases_var[ MAE == 1, Combined := 1]
+
+cases_var_Combined &lt;- cases_var[, sum(Combined, na.rm = T), by = &quot;Variant&quot;]
+cases_var_Combined[, phenotype := &quot;Combined&quot;]
+
+
+
+cases_var &lt;- rbind(cases_var_Combined, cases_var_AE, cases_var_AS, cases_var_MAE)
+cases_var[ , perc := V1 / Nalleles] #!!!!!!!
+
+
+cases_var &lt;- merge(cases_var, Nalleles_per_vt, by = &quot;Variant&quot;)
+cases_var[, perc_vt:= V1 / Total_a_vt]
+
+cases_var[ , VariantX := Variant]
+cases_var[VariantX == &quot;promoter&quot;, VariantX := &quot;non-coding&quot;]
+cases_var[VariantX == &quot;intergenic&quot;, VariantX := &quot;non-coding&quot;]
+cases_var[VariantX == &quot;start-loss&quot;, VariantX := &quot;non-coding&quot;]
+cases_var[VariantX == &quot;deletion&quot;, VariantX := &quot;indel&quot;]
+cases_var$VariantX &lt;- factor(cases_var$VariantX, levels = c(&quot;intronic&quot;,&quot;non-coding&quot;, &quot;5UTR&quot;, &quot;CNV&quot;, &quot;indel&quot;, &quot;missense&quot;, &quot;synonymous&quot;, &quot;splice&quot;, &quot;frameshift&quot;, &quot;nonsense&quot;  ))
+cases_var[ , Total_a_vtX := sum(Total_a_vt), by = .(phenotype, VariantX)]
+cases_var[ , V1X := sum(V1), by = .(phenotype, VariantX)]
+cases_var[, perc_vtX:= V1X / Total_a_vtX]
+
+
+cases_var[, Variant2 := paste0(VariantX, &quot;\n(N = &quot;, Total_a_vtX, &quot;)&quot;)]
+cases_var &lt;- cases_var[ order( VariantX)]
+cases_var$Variant2 &lt;- factor(cases_var$Variant2, levels = unique(cases_var$Variant2))
+
+
+
+
+
+cases_var[, prioratised_alleles := sum(V1), by = phenotype]
+cases_var[ , proportion_causal_alleles := V1 / prioratised_alleles] #!!!!!!!
+cases_var[, phenotype2 := paste0(phenotype, &quot; (N alleles = &quot;, prioratised_alleles, &quot;)&quot;)]
+
+rm(cases_var_AE, cases_var_AS, cases_var_MAE)
+
+outlier_colors &lt;- c( &quot;Combined&quot; = &quot;#C27BA0&quot;,
+                     &quot;Aberrant expression&quot; = &quot;#F4CCCC&quot;,  
+                     &quot;Aberrant splicing&quot; = &quot;#CFE2F3&quot;,     
+                     &quot;Mono-allelic expression&quot; = &quot;#D9EAD3&quot;)
+
+
+cases_var$phenotype &lt;- factor(cases_var$phenotype, levels = c(&quot;Combined&quot;,&quot;Aberrant expression&quot;,&quot;Mono-allelic expression&quot;, &quot;Aberrant splicing&quot; ))
+cases_var &lt;- cases_var[order(phenotype)]
+cases_var$phenotype2 &lt;- factor(cases_var$phenotype2, levels = unique(cases_var$phenotype2))
+
+cases_var &lt;- cases_var[order(V1, decreasing = T)]
+cases_var$Variant &lt;- factor(cases_var$Variant, levels = cases_var[phenotype == &quot;Combined&quot; ]$Variant )</code></pre>
+<p>Main version</p>
+<pre class="r"><code>cases_var$Variant &lt;- factor(cases_var$Variant, levels = c(&quot;intronic&quot;,&quot;splice&quot;, &quot;frameshift&quot;,  &quot;missense&quot;, &quot;nonsense&quot;, &quot;synonymous&quot;,  &quot;deletion&quot;, &quot;CNV&quot;, &quot;Other&quot;  ))
+
+
+p3c &lt;- ggplot(cases_var, aes(Variant, proportion_causal_alleles) )+
+  geom_col(aes(fill = phenotype)) +
+  scale_fill_manual( values = outlier_colors) +
+  scale_y_continuous(breaks= c( 0,  0.2, 0.4), labels = scales::percent_format(accuracy = 1)) +
+  xlab(&quot;&quot;) + 
+  ylab(paste0(&quot;\nProportion of causal alleles (N cases = 120)&quot; )) +
+  labs(fill = &quot;Study&quot;,
+       size = &quot;N diagnosed individuals&quot;)+ 
+  theme_classic()+
+
+  theme(axis.title.y= element_text( size=12,  face=&quot;bold&quot;),
+        axis.title.x= element_text( size=12,  face=&quot;bold&quot;),
+        axis.text.x = element_text(face=&quot;bold&quot;,  size=12),
+        axis.text.y= element_text(face=&quot;bold&quot;,  size=12),
+        strip.text.x = element_text(size = 12,  face = &quot;bold&quot;),
+        legend.position = &quot;none&quot;)+
+  facet_wrap(~phenotype2, nrow = 4, scales = &quot;free_y&quot;)</code></pre>
+<pre class="r"><code>p3c</code></pre>
+<p><img src="Scripts_RNA_seq_Readme_RNAseq_files/figure-html/unnamed-chunk-6-1.png" width="960" /></p>
+</div>
+
+<div id="rmd-source-code">IyctLS0KIycgdGl0bGU6IE92ZXJ2aWV3IG9mIFJOQS1zZXEgc3R1ZGllcyBhbmQgZGF0YSB1c2VkIGZvciBPZGRzUGF0aAojJyBhdXRob3I6IERtaXRyaWkgU21pcm5vdgojJyB3YjoKIycgIGlucHV0OgojJyAgLSBjb25maWc6ICdzcmMvY29uZmlnLlInCiMnICAtIHNhOiAnYHNtIGNvbmZpZ1siUk5BX0FOTk9UQVRJT04iXWAnCiMnICBvdXRwdXQ6CiMnIG91dHB1dDogCiMnICAgaHRtbF9kb2N1bWVudDoKIycgICAgY29kZV9mb2xkaW5nOiBoaWRlCiMnICAgIGNvZGVfZG93bmxvYWQ6IFRSVUUKIyctLS0KCgpzb3VyY2Uoc25ha2VtYWtlQGlucHV0JGNvbmZpZykKIyBzb3VyY2UoJ3NyYy9jb25maWcuUicpCgoKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwojIyMjIyMjIyMjIyMjIyMjIFN0dWRpZXMgb3ZlcnZpZXcgIyMjIyMjIyMjIyMjCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKCiMnICMgRGlhZ25vc3RpYyByYXRlcyBpbiB0aGUgUk5BLXNlcSBzdHVkaWVzCnN0dWRpZXNfZGYgPSBkYXRhLnRhYmxlKAogIElEID0gYygiS3JlbWVyIGV0IGFsLiAyMDE3IiwiQ3VtbWluZ3MgZXQgYWwuIDIwMTciLCJHb25vcmF6a3kgZXQgYWwuIDIwMTkiLAogICAgICAgICAiRnLDqXNhcmQgZXQgYWwuIDIwMTkiLCJMZWUgZXQgYWwuIDIwMjAiLCJSZW50YXMgZXQgYWwuIDIwMjAiLCAKICAgICAgICAgIk11cmRvY2sgZXQgYWwuIDIwMjAiLCAiTWFkZGlyZXZ1bGEgZXQgYWwuIDIwMjAiLCAiS29wYWp0aWNoIGV0IGFsLiwgMjAyMSIsICJZZXBleiBldCBhbC4sIDIwMjEiLCAiIiksCiAgQWZmZWN0ZWRfaW5kaXZpZHVhbHMgPSBjKDEwNSwgNjMsIDI5LCA5NCwgNDgsIDE1LCAxMTUsIDExLCAxNDUsIDMwMywgMCksCiAgVW5kaWFnbm9zZWRfaW5kaXZpZHVhbHMgPSBjKDQ4LCA1MCwgMjUsIDgwLCA0OCwgNSwgODMsIDExLCAxMjEsIDIwNSwgMCApLAogIERpYWdub3NlZF9pbmRpdmlkdWFscyA9IGMoNSwgMTcsIDksIDYsIDcsIDIsIDE0LCA2LCAxMywgMzMsIDApICkKc3R1ZGllc19kZlsgLCBEaWFnbm9zdGljX3JhdGUgOj0gIERpYWdub3NlZF9pbmRpdmlkdWFscyAgLyAgVW5kaWFnbm9zZWRfaW5kaXZpZHVhbHNdCnN0dWRpZXNfZGZbVW5kaWFnbm9zZWRfaW5kaXZpZHVhbHMgPT0gMCAsIERpYWdub3N0aWNfcmF0ZSA6PSAgMF0KCnN0dWRpZXNfZGYgPC0gc3R1ZGllc19kZlsgIShJRCAlaW4lIGMoIlJlbnRhcyBldCBhbC4gMjAyMCIsICAiTWFkZGlyZXZ1bGEgZXQgYWwuIDIwMjAiKSldCgpzdHVkaWVzX2RmIDwtIHN0dWRpZXNfZGZbb3JkZXIoVW5kaWFnbm9zZWRfaW5kaXZpZHVhbHMpXQpzdHVkaWVzX2RmJElEIDwtIGZhY3RvcihzdHVkaWVzX2RmJElELCBsZXZlbHMgPSBzdHVkaWVzX2RmJElEICApCgoKCgpwMSA8LSBnZ3Bsb3Qoc3R1ZGllc19kZltJRCAhPSAiIl0sIGFlcyhVbmRpYWdub3NlZF9pbmRpdmlkdWFscywgRGlhZ25vc3RpY19yYXRlKSApKyAjICwgc2l6ZSA9ICBEaWFnbm9zZWRfaW5kaXZpZHVhbHMKICBnZW9tX3BvaW50KGFlcyhmaWxsID0gSUQpLCBzaGFwZSA9IDIxLCBzaXplID0gNS41KSArCiAgc2NhbGVfZmlsbF9wdG9sKGd1aWRlID0gZ3VpZGVfbGVnZW5kKG92ZXJyaWRlLmFlcyA9IGxpc3Qoc2hhcGUgPSAyMSwgc2l6ZSA9IDMuNSkpKSsKICBzY2FsZV95X2NvbnRpbnVvdXMobGFiZWxzID0gc2NhbGVzOjpwZXJjZW50X2Zvcm1hdChhY2N1cmFjeSA9IDEpKSArCiAgeWxhYigiVmFsaWRhdGlvbiArIGRpc2NvdmVyeSByYXRlIikgKyAKICB4bGFiKCJOIGdlbmV0aWNhbGx5IHVuc29sdmVkIGluZGl2aWR1YWxzIikgKwogIGxhYnMoZmlsbCA9ICJTdHVkeSIpKyAgIywgc2l6ZSA9ICJOIGRpYWdub3NlZCBpbmRpdmlkdWFscyIKICB0aGVtZV9jbGFzc2ljKCkrCiAgI3NjYWxlX3NpemUocmFuZ2UgPSBjKDMsOCkpKwogIHRoZW1lKGF4aXMudGl0bGUueT0gZWxlbWVudF90ZXh0KCBzaXplPTEyLCAgZmFjZT0iYm9sZCIpLAogICAgICAgIGF4aXMudGl0bGUueD0gZWxlbWVudF90ZXh0KCBzaXplPTEyLCAgZmFjZT0iYm9sZCIpLAogICAgICAgIGF4aXMudGV4dC54ID0gZWxlbWVudF90ZXh0KGZhY2U9ImJvbGQiLCAgc2l6ZT0xMiksCiAgICAgICAgYXhpcy50ZXh0Lnk9IGVsZW1lbnRfdGV4dChmYWNlPSJib2xkIiwgIHNpemU9MTIpLAogICAgICAgIGxlZ2VuZC5wb3NpdGlvbiA9IGMoMC44LCAwLjcpKQoKCgoKCm0gPC0gbG0oRGlhZ25vc2VkX2luZGl2aWR1YWxzIH4gVW5kaWFnbm9zZWRfaW5kaXZpZHVhbHMsIHN0dWRpZXNfZGYgKQplcSA8LSBzdWJzdGl0dXRlKGl0YWxpYyh5KSA9PSBhICsgYiAlLiUgaXRhbGljKHgpKiIsIn5+aXRhbGljKHIpXjJ+Ij0ifnIyLCAKICAgICAgICAgICAgICAgICBsaXN0KGEgPSBmb3JtYXQodW5uYW1lKGNvZWYobSlbMV0pLCBkaWdpdHMgPSAyKSwKICAgICAgICAgICAgICAgICAgICAgIGIgPSBmb3JtYXQodW5uYW1lKGNvZWYobSlbMl0pLCBkaWdpdHMgPSAyKSwKICAgICAgICAgICAgICAgICAgICAgIHIyID0gZm9ybWF0KHN1bW1hcnkobSkkci5zcXVhcmVkLCBkaWdpdHMgPSAzKSkpCgoKCgoKCnAxXzIgPC0gZ2dwbG90KHN0dWRpZXNfZGZbSUQgIT0gIiJdLCBhZXMoVW5kaWFnbm9zZWRfaW5kaXZpZHVhbHMsIERpYWdub3NlZF9pbmRpdmlkdWFscykgKSsgIyAsIHNpemUgPSAgRGlhZ25vc2VkX2luZGl2aWR1YWxzCiAgZ2VvbV9wb2ludChhZXMoZmlsbCA9IElEKSwgc2hhcGUgPSAyMSwgc2l6ZSA9IDUuNSkgKwogIHNjYWxlX2ZpbGxfcHRvbChndWlkZSA9IGd1aWRlX2xlZ2VuZChvdmVycmlkZS5hZXMgPSBsaXN0KHNoYXBlID0gMjEsIHNpemUgPSAzLjUpKSkrCiAgZ2VvbV9zbW9vdGgobWV0aG9kPSdsbScsIGNvbG91cj0iZ3JleTUwIiwgc2UgPSBGQUxTRSkrCiAgeWxhYigiRGlhZ25vc2VkIGNhc2VzIGJ5IFJOQS1zZXEiKSArIAogIHhsYWIoIkFuYWx5c2VkIHVuc29sdmVkIGluZGl2aWR1YWxzIikgKwogIGxhYnMoZmlsbCA9ICJTdHVkeSIpKyAgIywgc2l6ZSA9ICJOIGRpYWdub3NlZCBpbmRpdmlkdWFscyIKICB0aGVtZV9jbGFzc2ljKCkrCiAgI3NjYWxlX3NpemUocmFuZ2UgPSBjKDMsOCkpKwogIGV4cGFuZF9saW1pdHMoeCA9IDAsIHkgPSAwKSArCiAgdGhlbWUoYXhpcy50aXRsZS55PSBlbGVtZW50X3RleHQoIHNpemU9MTIsICBmYWNlPSJib2xkIiksCiAgICAgICAgYXhpcy50aXRsZS54PSBlbGVtZW50X3RleHQoIHNpemU9MTIsICBmYWNlPSJib2xkIiksCiAgICAgICAgYXhpcy50ZXh0LnggPSBlbGVtZW50X3RleHQoZmFjZT0iYm9sZCIsICBzaXplPTEyKSwKICAgICAgICBheGlzLnRleHQueT0gZWxlbWVudF90ZXh0KGZhY2U9ImJvbGQiLCAgc2l6ZT0xMikpCnAxXzIgPC0gcDFfMiArIGdlb21fdGV4dCh4ID0xMDAsIHkgPSAzMCwgbGFiZWwgPSBhcy5jaGFyYWN0ZXIoYXMuZXhwcmVzc2lvbihlcSkpLCBwYXJzZSA9IFRSVUUpCgoKIysgZmlnLndpZHRoPTExLCBmaWcuaGVpZ2h0PTUKcDEgfCBwMV8yCgoKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwojIyMjIyMjIyMjIyMjIyMjIEdlbmV0aWMgZGlhZ25vc2lzIGluIHRoZSBSTkEtc2VxIHN0dWRpZXMgIyMjIyMjIyMjIyMjCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKCgoKIycgIyBHZW5ldGljIGRpYWdub3NpcyBpbiB0aGUgUk5BLXNlcSBzdHVkaWVzCmNhc2VzX2RmID0gZnJlYWQoIi4uL1ZhcmlhbnRfaW50ZXJwcmV0YXRpb25fUk5BL1JOQV9zdHVkaWVzX3ZhcmlhbnRfaW50ZXJwcmV0YXRpb24uY3N2IikKY2FzZXNfZGYgPC0gY2FzZXNfZGZbICEoU3R1ZHkgJWluJSBjKCJSZW50YXMgZXQgYWwuIDIwMjAiLCAgIk1hZGRpcmV2dWxhIGV0IGFsLiAyMDIwIikpXQoKY2FzZXNfZGZbU3R1ZHkgPT0gICJDdW1taW5ncyBldCBhbC4gMjAxNyIgJiBDYXNlSUQgPT0gIkUyIiwgVmFyaWFudF9lZmZlY3QgOj0gInNwbGljZTsgc3BsaWNlIl0gCmNhc2VzX2RmW1N0dWR5ID09ICAiQ3VtbWluZ3MgZXQgYWwuIDIwMTciICYgQ2FzZUlEID09ICJFMiIsIE1BRSA6PSAxXSAKCmNhc2VzX2RmW1N0dWR5ID09ICAiQ3VtbWluZ3MgZXQgYWwuIDIwMTciICYgQ2FzZUlEID09ICJDOSIsIE1BRSA6PSAxXQpjYXNlc19kZltTdHVkeSA9PSAgIkN1bW1pbmdzIGV0IGFsLiAyMDE3IiAmIENhc2VJRCA9PSAiTjI1IiwgTUFFIDo9IDFdCmNhc2VzX2RmW1N0dWR5ID09ICAiQ3VtbWluZ3MgZXQgYWwuIDIwMTciICYgQ2FzZUlEID09ICJOMjIiLCBNQUUgOj0gMV0KCgpjYXNlc19kZl9zIDwtIGNhc2VzX2RmW1NwbGljaW5nX29ubHkgPT0gIk5vIl0KY2FzZXNfZGZfc1sgLCBvdXRsaWVyIDo9ICJObyJdCmNhc2VzX2RmX3NbIEFFID09IDEsIG91dGxpZXIgOj0gIkFFIl0KY2FzZXNfZGZfc1sgQVMgPT0gMSwgb3V0bGllciA6PSAiQVMiXQpjYXNlc19kZl9zWyBNQUUgPT0gMSwgb3V0bGllciA6PSAiTUFFIl0KY2FzZXNfZGZfc1sgQUUgPT0gMSAmIEFTID09IDEsIG91dGxpZXIgOj0gIkFFICsgQVMiXQpjYXNlc19kZl9zWyBBRSA9PSAxICYgTUFFID09IDEsIG91dGxpZXIgOj0gIkFFICsgTUFFIl0KY2FzZXNfZGZfc1sgQUUgPT0gMSAmIEFTID09IDEgJiBNQUUgPT0gMSwgb3V0bGllciA6PSAiQUUgKyBBUyArIE1BRSJdCgpjYXNlc19kZlssIGMoIlZhcmlhbnQxIiwgIlZhcmlhbnQyIikgOj0gdHN0cnNwbGl0KFZhcmlhbnRfZWZmZWN0LCAiOyAiLCBmaXhlZD1UUlVFKV0KY2FzZXNfZGZbIGlzLm5hKFZhcmlhbnQyKSAmIEFsbGVsZXMgPT0gMiwgVmFyaWFudDIgOj0gVmFyaWFudDFdCgpjYXNlc19kZlssIGNvbXBfaGV0IDo9IFZhcmlhbnRfZWZmZWN0ICVsaWtlJSAiOyJdCgpkZiA8LSBjYXNlc19kZltjb21wX2hldCA9PSBUIHwgQWxsZWxlcyA9PSAxIF0KCgoKZGYgPC0gY2FzZXNfZGZbY29tcF9oZXQgPT0gRl0KZGYgPC0gZGZbLCAuTiwgYnkgPSBWYXJpYW50X2VmZmVjdF0KZGZbICwgVG90YWwgOj0gc3VtKE4pXQpkZlsgLCBwZXJjIDo9IE4vVG90YWxdCmRmIDwtIGRmW29yZGVyKE4sIGRlY3JlYXNpbmcgPSBUKV0KCgpjYXNlc19kZlssIHN0X2Nhc2UgOj0gcGFzdGUwKFN0dWR5LCAiXyIsIENhc2VJRCApXQpjYXNlc192YXIxIDwtIGNhc2VzX2RmWyAsIGMoInN0X2Nhc2UiLCAiVmFyaWFudDEiLCAiQUUiLCAiQVMiLCAiTUFFIiApXQpzZXRuYW1lcyhjYXNlc192YXIxLCBjKCJWYXJpYW50MSIpLCBjKCJWYXJpYW50IikpCmNhc2VzX3ZhcjIgPC0gY2FzZXNfZGZbICwgYygic3RfY2FzZSIsICJWYXJpYW50MiIsICJBRSIsICJBUyIsICJNQUUiICldCmNhc2VzX3ZhcjIgPC0gY2FzZXNfdmFyMlshaXMubmEoVmFyaWFudDIpXQpjYXNlc192YXIyW3N0X2Nhc2UgPT0gICJDdW1taW5ncyBldCBhbC4gMjAxN19FMiIgJiBWYXJpYW50MiA9PSAic3BsaWNlIiwgTUFFIDo9IDBdIAoKc2V0bmFtZXMoY2FzZXNfdmFyMiwgYygiVmFyaWFudDIiKSwgYygiVmFyaWFudCIpKQpjYXNlc192YXIgPC0gcmJpbmQoY2FzZXNfdmFyMSwgY2FzZXNfdmFyMikKcm0oY2FzZXNfdmFyMSwgY2FzZXNfdmFyMikKY2FzZXNfdmFyW1ZhcmlhbnQgPT0gImlub25zZW5zZSIsICBWYXJpYW50IDo9ICJub25zZW5zZSJdCgpjYXNlc192YXIgPC0gY2FzZXNfdmFyW3N0X2Nhc2UgIT0gICJHb25vcmF6a3kgZXQgYWwuIDIwMTlfQ2FzZTYiXQpjYXNlc192YXIgPC0gY2FzZXNfdmFyW3N0X2Nhc2UgIT0gICJZZXBleiBldCBhbC4sIDIwMjFfUjc3NjExIl0KCgpjYXNlc192YXJbc3RfY2FzZSA9PSAgIkN1bW1pbmdzIGV0IGFsLiAyMDE3X0M5IiAmIFZhcmlhbnQgPT0gInNwbGljZSIsIE1BRSA6PSAwXQpjYXNlc192YXJbc3RfY2FzZSA9PSAgIkN1bW1pbmdzIGV0IGFsLiAyMDE3X04yNSIgJiBWYXJpYW50ID09ICJpbnRyb25pYyIsIE1BRSA6PSAwXQpjYXNlc192YXJbc3RfY2FzZSA9PSAgIkN1bW1pbmdzIGV0IGFsLiAyMDE3X04yMiIgJiBWYXJpYW50ID09ICJtaXNzZW5zZSIsIE1BRSA6PSAwXQoKCmNhc2VzX3ZhcltzdF9jYXNlID09ICAiR29ub3Jhemt5IGV0IGFsLiAyMDE5X0Nhc2UxNSIgJiBWYXJpYW50ID09ICJtaXNzZW5zZSIsIE1BRSA6PSAwXQpjYXNlc192YXJbc3RfY2FzZSA9PSAgIkdvbm9yYXpreSBldCBhbC4gMjAxOV9DYXNlMTciICYgVmFyaWFudCA9PSAibWlzc2Vuc2UiLCBNQUUgOj0gMF0KY2FzZXNfdmFyW3N0X2Nhc2UgPT0gICJZZXBleiBldCBhbC4sIDIwMjFfUjc0MDY1IiAmIFZhcmlhbnQgPT0gInN5bm9ueW1vdXMiLCBNQUUgOj0gMF0KY2FzZXNfdmFyW3N0X2Nhc2UgPT0gICJZZXBleiBldCBhbC4sIDIwMjFfUjc3MzY1IiAmIFZhcmlhbnQgPT0gIm1pc3NlbnNlIiwgTUFFIDo9IDBdCmNhc2VzX3ZhcltzdF9jYXNlID09ICAiWWVwZXogZXQgYWwuLCAyMDIxX1IyMTQ3MCIgJiBWYXJpYW50ID09ICJzcGxpY2UiLCBNQUUgOj0gMF0KI2Nhc2VzX3ZhcltzdF9jYXNlID09ICAiWWVwZXogZXQgYWwuLCAyMDIxX1IxMTI4NSIgJiBWYXJpYW50ID09ICJtaXNzZW5zZSIsIE1BRSA6PSAwXQpjYXNlc192YXJbc3RfY2FzZSA9PSAgIlllcGV6IGV0IGFsLiwgMjAyMV9SMTEyNTgiICYgVmFyaWFudCA9PSAibWlzc2Vuc2UiLCBNQUUgOj0gMF0KCmNhc2VzX3ZhcltzdF9jYXNlID09ICAiWWVwZXogZXQgYWwuLCAyMDIxX1IyNjcxMCIgJiBWYXJpYW50ID09ICJtaXNzZW5zZSIsIE1BRSA6PSAwXQpjYXNlc192YXJbc3RfY2FzZSA9PSAgIlllcGV6IGV0IGFsLiwgMjAyMV9SMjk2MjAiICYgVmFyaWFudCA9PSAibWlzc2Vuc2UiLCBNQUUgOj0gMF0KY2FzZXNfdmFyW3N0X2Nhc2UgPT0gICJZZXBleiBldCBhbC4sIDIwMjFfUjgwMTg0IiAmIFZhcmlhbnQgPT0gIm1pc3NlbnNlIiwgTUFFIDo9IDBdCmNhc2VzX3ZhcltzdF9jYXNlID09ICAiWWVwZXogZXQgYWwuLCAyMDIxX1I4OTkxMiIgJiBWYXJpYW50ID09ICJtaXNzZW5zZSIsIE1BRSA6PSAwXQojY2FzZXNfdmFyW3N0X2Nhc2UgPT0gICJZZXBleiBldCBhbC4sIDIwMjFfUjc3NjExIiAmIFZhcmlhbnQgPT0gIm1pc3NlbnNlIiwgTUFFIDo9IDBdCmNhc2VzX3ZhcltzdF9jYXNlID09ICAiWWVwZXogZXQgYWwuLCAyMDIxX1IyNDI4OSIgJiBWYXJpYW50ID09ICJtaXNzZW5zZSIsIE1BRSA6PSAwXQoKCiMgR3JvdXAgdmFyaWFudHMKY2FzZXNfdmFyW1ZhcmlhbnQgPT0gImludGVyZ2VuaWMiLCBWYXJpYW50IDo9ICJpbnRyb25pYyIgXQpjYXNlc192YXJbVmFyaWFudCA9PSAiNVVUUiIsIFZhcmlhbnQgOj0gIlVUUiIgXQpjYXNlc192YXJbVmFyaWFudCAlaW4lIGMoIlVUUiIsICJwcm9tb3RlciIsICJpbmRlbCIsICJzdGFydC1sb3NzIiksIFZhcmlhbnQgOj0gIk90aGVyIiBdCgoKTmFsbGVsZXMgPC0gbnJvdyhjYXNlc192YXIpCgpOYWxsZWxlc19wZXJfdnQgPC0gY2FzZXNfdmFyWyAsIC5OLCBieSA9IFZhcmlhbnRdCnNldG5hbWVzKE5hbGxlbGVzX3Blcl92dCwgIk4iLCAiVG90YWxfYV92dCIpCgpjYXNlc192YXJfQUUgPC0gY2FzZXNfdmFyWywgc3VtKEFFLCBuYS5ybSA9IFQpLCBieSA9ICJWYXJpYW50Il0KY2FzZXNfdmFyX0FFWywgcGhlbm90eXBlIDo9ICJBYmVycmFudCBleHByZXNzaW9uIl0KCmNhc2VzX3Zhcl9BUyA8LSBjYXNlc192YXJbLCBzdW0oQVMsIG5hLnJtID0gVCksIGJ5ID0gIlZhcmlhbnQiXQpjYXNlc192YXJfQVNbLCBwaGVub3R5cGUgOj0gIkFiZXJyYW50IHNwbGljaW5nIl0KCmNhc2VzX3Zhcl9NQUUgPC0gY2FzZXNfdmFyWywgc3VtKE1BRSwgbmEucm0gPSBUKSwgYnkgPSAiVmFyaWFudCJdCmNhc2VzX3Zhcl9NQUVbLCBwaGVub3R5cGUgOj0gIk1vbm8tYWxsZWxpYyBleHByZXNzaW9uIl0KCgpjYXNlc192YXJbICwgQ29tYmluZWQgOj0gMF0KY2FzZXNfdmFyWyBBRSA9PSAxLCBDb21iaW5lZCA6PSAxXQpjYXNlc192YXJbIEFTID09IDEsIENvbWJpbmVkIDo9IDFdCmNhc2VzX3ZhclsgTUFFID09IDEsIENvbWJpbmVkIDo9IDFdCgpjYXNlc192YXJfQ29tYmluZWQgPC0gY2FzZXNfdmFyWywgc3VtKENvbWJpbmVkLCBuYS5ybSA9IFQpLCBieSA9ICJWYXJpYW50Il0KY2FzZXNfdmFyX0NvbWJpbmVkWywgcGhlbm90eXBlIDo9ICJDb21iaW5lZCJdCgoKCmNhc2VzX3ZhciA8LSByYmluZChjYXNlc192YXJfQ29tYmluZWQsIGNhc2VzX3Zhcl9BRSwgY2FzZXNfdmFyX0FTLCBjYXNlc192YXJfTUFFKQpjYXNlc192YXJbICwgcGVyYyA6PSBWMSAvIE5hbGxlbGVzXSAjISEhISEhIQoKCmNhc2VzX3ZhciA8LSBtZXJnZShjYXNlc192YXIsIE5hbGxlbGVzX3Blcl92dCwgYnkgPSAiVmFyaWFudCIpCmNhc2VzX3ZhclssIHBlcmNfdnQ6PSBWMSAvIFRvdGFsX2FfdnRdCgpjYXNlc192YXJbICwgVmFyaWFudFggOj0gVmFyaWFudF0KY2FzZXNfdmFyW1ZhcmlhbnRYID09ICJwcm9tb3RlciIsIFZhcmlhbnRYIDo9ICJub24tY29kaW5nIl0KY2FzZXNfdmFyW1ZhcmlhbnRYID09ICJpbnRlcmdlbmljIiwgVmFyaWFudFggOj0gIm5vbi1jb2RpbmciXQpjYXNlc192YXJbVmFyaWFudFggPT0gInN0YXJ0LWxvc3MiLCBWYXJpYW50WCA6PSAibm9uLWNvZGluZyJdCmNhc2VzX3ZhcltWYXJpYW50WCA9PSAiZGVsZXRpb24iLCBWYXJpYW50WCA6PSAiaW5kZWwiXQpjYXNlc192YXIkVmFyaWFudFggPC0gZmFjdG9yKGNhc2VzX3ZhciRWYXJpYW50WCwgbGV2ZWxzID0gYygiaW50cm9uaWMiLCJub24tY29kaW5nIiwgIjVVVFIiLCAiQ05WIiwgImluZGVsIiwgIm1pc3NlbnNlIiwgInN5bm9ueW1vdXMiLCAic3BsaWNlIiwgImZyYW1lc2hpZnQiLCAibm9uc2Vuc2UiICApKQpjYXNlc192YXJbICwgVG90YWxfYV92dFggOj0gc3VtKFRvdGFsX2FfdnQpLCBieSA9IC4ocGhlbm90eXBlLCBWYXJpYW50WCldCmNhc2VzX3ZhclsgLCBWMVggOj0gc3VtKFYxKSwgYnkgPSAuKHBoZW5vdHlwZSwgVmFyaWFudFgpXQpjYXNlc192YXJbLCBwZXJjX3Z0WDo9IFYxWCAvIFRvdGFsX2FfdnRYXQoKCmNhc2VzX3ZhclssIFZhcmlhbnQyIDo9IHBhc3RlMChWYXJpYW50WCwgIlxuKE4gPSAiLCBUb3RhbF9hX3Z0WCwgIikiKV0KY2FzZXNfdmFyIDwtIGNhc2VzX3Zhclsgb3JkZXIoIFZhcmlhbnRYKV0KY2FzZXNfdmFyJFZhcmlhbnQyIDwtIGZhY3RvcihjYXNlc192YXIkVmFyaWFudDIsIGxldmVscyA9IHVuaXF1ZShjYXNlc192YXIkVmFyaWFudDIpKQoKCgoKCmNhc2VzX3ZhclssIHByaW9yYXRpc2VkX2FsbGVsZXMgOj0gc3VtKFYxKSwgYnkgPSBwaGVub3R5cGVdCmNhc2VzX3ZhclsgLCBwcm9wb3J0aW9uX2NhdXNhbF9hbGxlbGVzIDo9IFYxIC8gcHJpb3JhdGlzZWRfYWxsZWxlc10gIyEhISEhISEKY2FzZXNfdmFyWywgcGhlbm90eXBlMiA6PSBwYXN0ZTAocGhlbm90eXBlLCAiIChOIGFsbGVsZXMgPSAiLCBwcmlvcmF0aXNlZF9hbGxlbGVzLCAiKSIpXQoKcm0oY2FzZXNfdmFyX0FFLCBjYXNlc192YXJfQVMsIGNhc2VzX3Zhcl9NQUUpCgpvdXRsaWVyX2NvbG9ycyA8LSBjKCAiQ29tYmluZWQiID0gIiNDMjdCQTAiLAogICAgICAgICAgICAgICAgICAgICAiQWJlcnJhbnQgZXhwcmVzc2lvbiIgPSAiI0Y0Q0NDQyIsICAKICAgICAgICAgICAgICAgICAgICAgIkFiZXJyYW50IHNwbGljaW5nIiA9ICIjQ0ZFMkYzIiwgICAgIAogICAgICAgICAgICAgICAgICAgICAiTW9uby1hbGxlbGljIGV4cHJlc3Npb24iID0gIiNEOUVBRDMiKQoKCmNhc2VzX3ZhciRwaGVub3R5cGUgPC0gZmFjdG9yKGNhc2VzX3ZhciRwaGVub3R5cGUsIGxldmVscyA9IGMoIkNvbWJpbmVkIiwiQWJlcnJhbnQgZXhwcmVzc2lvbiIsIk1vbm8tYWxsZWxpYyBleHByZXNzaW9uIiwgIkFiZXJyYW50IHNwbGljaW5nIiApKQpjYXNlc192YXIgPC0gY2FzZXNfdmFyW29yZGVyKHBoZW5vdHlwZSldCmNhc2VzX3ZhciRwaGVub3R5cGUyIDwtIGZhY3RvcihjYXNlc192YXIkcGhlbm90eXBlMiwgbGV2ZWxzID0gdW5pcXVlKGNhc2VzX3ZhciRwaGVub3R5cGUyKSkKCmNhc2VzX3ZhciA8LSBjYXNlc192YXJbb3JkZXIoVjEsIGRlY3JlYXNpbmcgPSBUKV0KY2FzZXNfdmFyJFZhcmlhbnQgPC0gZmFjdG9yKGNhc2VzX3ZhciRWYXJpYW50LCBsZXZlbHMgPSBjYXNlc192YXJbcGhlbm90eXBlID09ICJDb21iaW5lZCIgXSRWYXJpYW50ICkKCgoKCiMnIE1haW4gdmVyc2lvbgpjYXNlc192YXIkVmFyaWFudCA8LSBmYWN0b3IoY2FzZXNfdmFyJFZhcmlhbnQsIGxldmVscyA9IGMoImludHJvbmljIiwic3BsaWNlIiwgImZyYW1lc2hpZnQiLCAgIm1pc3NlbnNlIiwgIm5vbnNlbnNlIiwgInN5bm9ueW1vdXMiLCAgImRlbGV0aW9uIiwgIkNOViIsICJPdGhlciIgICkpCgoKcDNjIDwtIGdncGxvdChjYXNlc192YXIsIGFlcyhWYXJpYW50LCBwcm9wb3J0aW9uX2NhdXNhbF9hbGxlbGVzKSApKwogIGdlb21fY29sKGFlcyhmaWxsID0gcGhlbm90eXBlKSkgKwogIHNjYWxlX2ZpbGxfbWFudWFsKCB2YWx1ZXMgPSBvdXRsaWVyX2NvbG9ycykgKwogIHNjYWxlX3lfY29udGludW91cyhicmVha3M9IGMoIDAsICAwLjIsIDAuNCksIGxhYmVscyA9IHNjYWxlczo6cGVyY2VudF9mb3JtYXQoYWNjdXJhY3kgPSAxKSkgKwogIHhsYWIoIiIpICsgCiAgeWxhYihwYXN0ZTAoIlxuUHJvcG9ydGlvbiBvZiBjYXVzYWwgYWxsZWxlcyAoTiBjYXNlcyA9IDEyMCkiICkpICsKICBsYWJzKGZpbGwgPSAiU3R1ZHkiLAogICAgICAgc2l6ZSA9ICJOIGRpYWdub3NlZCBpbmRpdmlkdWFscyIpKyAKICB0aGVtZV9jbGFzc2ljKCkrCgogIHRoZW1lKGF4aXMudGl0bGUueT0gZWxlbWVudF90ZXh0KCBzaXplPTEyLCAgZmFjZT0iYm9sZCIpLAogICAgICAgIGF4aXMudGl0bGUueD0gZWxlbWVudF90ZXh0KCBzaXplPTEyLCAgZmFjZT0iYm9sZCIpLAogICAgICAgIGF4aXMudGV4dC54ID0gZWxlbWVudF90ZXh0KGZhY2U9ImJvbGQiLCAgc2l6ZT0xMiksCiAgICAgICAgYXhpcy50ZXh0Lnk9IGVsZW1lbnRfdGV4dChmYWNlPSJib2xkIiwgIHNpemU9MTIpLAogICAgICAgIHN0cmlwLnRleHQueCA9IGVsZW1lbnRfdGV4dChzaXplID0gMTIsICBmYWNlID0gImJvbGQiKSwKICAgICAgICBsZWdlbmQucG9zaXRpb24gPSAibm9uZSIpKwogIGZhY2V0X3dyYXAofnBoZW5vdHlwZTIsIG5yb3cgPSA0LCBzY2FsZXMgPSAiZnJlZV95IikKCiMrIGZpZy53aWR0aD0xMCwgZmlnLmhlaWdodD03CnAzYwoKCgoKCgoKCgoKCg==</div>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeSourceEmbed("Readme_RNAseq.R");
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

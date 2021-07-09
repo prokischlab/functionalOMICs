@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Dmitrii Smirnov" />
+
+<meta name="date" content="2021-07-05" />
+
+<title>OddsPath aberrant splicing</title>
+
+<script src="libR/header-attrs-2.8/header-attrs.js"></script>
+<script src="libR/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="libR/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="libR/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="libR/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="libR/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="libR/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="libR/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="libR/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="libR/navigation-1.1/tabsets.js"></script>
+<script src="libR/navigation-1.1/codefolding.js"></script>
+<script src="libR/navigation-1.1/sourceembed.js"></script>
+<link href="libR/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="libR/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+#rmd-source-code {
+  display: none;
+}
+</style>
+
+
+<link rel="stylesheet" href="lib/add_content_table.css" type="text/css" />
+<link rel="stylesheet" href="lib/leo_style.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div id="header">
+
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+<li role="separator" class="divider"></li>
+<li><a id="rmd-download-source" href="#">Download Rmd</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">OddsPath aberrant splicing</h1>
+<h4 class="author">Dmitrii Smirnov</h4>
+<h4 class="date">2021-07-05</h4>
+
+</div>
+
+
+<pre class="r"><code>source(snakemake@input$config)
+# source(&#39;src/config.R&#39;)
+
+vt_PBC &lt;- fread(&quot;data/pathogenic_benign_variants.tsv&quot;)
+
+
+# Read Fraser 
+
+# fraser_gene &lt;- readRDS(&#39;/s/project/prokisch/processed_data/aberrant_splicing/results/fib--v29_results_all_by_gene.Rds&#39;) %&gt;% as.data.table()
+fg &lt;- readRDS(&quot;../Variant_interpretation_RNA/FRASER_gene_results_all.Rds&quot;) %&gt;% as.data.table()
+fg &lt;- fg[, c(&quot;sampleID&quot;, &quot;hgncSymbol&quot;, &quot;type&quot;, &quot;pValue&quot;, &quot;padjust&quot;,  &quot;psiValue&quot;,  &quot;deltaPsi&quot;, &quot;aberrant&quot;  )]
+setnames(fg, c( &quot;sampleID&quot;, &quot;hgncSymbol&quot;, &quot;pValue&quot;, &quot;padjust&quot;, &quot;aberrant&quot; ), 
+         c( &quot;RNA_ID&quot;,&quot;geneID&quot;, &quot;AS_PVALUE&quot;, &quot;AS_PADJ&quot; , &quot;AS&quot; ))
+
+fg[,geneID := toupper(geneID) ]
+fg[ , sample_gene := paste0(RNA_ID, &quot;_&quot;, geneID)]
+fg[, AS:= AS_PADJ &lt; 0.05]
+fg[ , Significance := &quot;n.s.&quot;]
+fg[ AS_PVALUE &lt; 0.05, Significance := &quot;p-value &lt; 0.05&quot;]
+
+
+
+
+fg &lt;- fg[RNA_ID %in% vt_PBC$RNA_ID ]
+fg &lt;- fg[geneID %in% unique(vt_PBC$geneID) ]
+
+
+vt_PBC &lt;- vt_PBC[RNA_ID %in% unique(fg$RNA_ID)]
+vt_PBC &lt;- vt_PBC[!is.na(var_type)]
+
+############################################################
+
+## Combine variants and expression
+vto &lt;- merge(vt_PBC, fg, by = c(&quot;RNA_ID&quot;, &quot;geneID&quot;))</code></pre>
+<div id="pathogenic-functional-evidence" class="section level1">
+<h1>Pathogenic functional evidence</h1>
+<pre class="r"><code>ggplot(vto, aes(var_type, deltaPsi) )+
+  geom_quasirandom(aes(fill = Pathogenicity, shape = genotype, size = Significance), color = &quot;grey20&quot;)+
+  scale_shape_manual(values = gene_shapes, guide = guide_legend(override.aes = list(fill = &quot;black&quot;, size = 3, order = 1)) ) +
+  scale_fill_manual(values = outlier_colors, guide = guide_legend(override.aes = list(shape = 23, size = 3, order = 2))) +
+  scale_size_manual(values = gene_size) +
+  xlab(&quot;&quot;) + 
+  ylab(&quot;Aberrant splicing\neffect size&quot;) +
+  labs(fill = &quot;Pathogenicity&quot;, 
+       size = &quot;Significance&quot;,
+       shape = &quot;Genotype&quot;)+  
+  geom_hline(yintercept = 0)+
+  geom_hline(yintercept = 0.3, linetype = &quot;dashed&quot;)+
+  geom_hline(yintercept = -0.3, linetype = &quot;dashed&quot;)+
+  theme_classic()+
+  theme(axis.title.y= element_text( size=12,  face=&quot;bold&quot;),
+        axis.title.x= element_text( size=12,  face=&quot;bold&quot;),
+        axis.text.x = element_text(face=&quot;bold&quot;,  size=12),
+        axis.text.y= element_text(face=&quot;bold&quot;,  size=12))</code></pre>
+<p><img src="Scripts_RNA_seq_Aberrant_splicing_files/figure-html/unnamed-chunk-2-1.png" width="960" /></p>
+<pre class="r"><code>############################
+#### Main figures #########
+############################
+
+
+######
+# effect size + p-value
+vto[, Abs_effect_size := abs(deltaPsi) ]
+thresholds &lt;- seq(0, 0.65, 0.05)
+
+t_iter &lt;- data.frame()
+for (t in thresholds){
+  ### All
+  P1 &lt;- nrow(vto[Pathogenicity == &quot;Pathogenic&quot; ]) / nrow(vto)
+  P2 &lt;- nrow(vto[Pathogenicity == &quot;Pathogenic&quot; &amp; AS_PVALUE &lt; 0.05 &amp; Abs_effect_size &gt; t]) / 
+    (nrow(vto[AS_PVALUE &lt; 0.05 &amp;  Abs_effect_size &gt; t]) +1 )
+  
+  df &lt;- data.frame(&quot;Type&quot; = &quot;FC&quot;,
+                   &quot;Variant_type&quot; = &quot;All&quot;,
+                   &quot;Threshold&quot; = t,
+                   &quot;OddsPath&quot; = (P2 * (1 - P1) ) / ((1 - P2) * P1 ) )
+  
+  t_iter &lt;- rbind(t_iter, df)
+  
+  ### PTV
+  P1 &lt;- nrow(vto[Pathogenicity == &quot;Pathogenic&quot; ]) / nrow(vto)
+  P2 &lt;- nrow(vto[Pathogenicity == &quot;Pathogenic&quot; &amp;  var_type == &quot;PTV&quot; &amp; AS_PVALUE &lt; 0.05 &amp;  Abs_effect_size &gt; t]) / 
+    (nrow(vto[var_type == &quot;PTV&quot; &amp; AS_PVALUE &lt; 0.05 &amp; Abs_effect_size &gt; t]) +1 )
+  
+  df &lt;- data.frame(&quot;Type&quot; = &quot;FC&quot;,
+                   &quot;Variant_type&quot; = &quot;PTV&quot;,
+                   &quot;Threshold&quot; = t,
+                   &quot;OddsPath&quot; = (P2 * (1 - P1) ) / ((1 - P2) * P1 ) )
+  
+  t_iter &lt;- rbind(t_iter, df)
+  
+  ### Coding
+  P1 &lt;- nrow(vto[Pathogenicity == &quot;Pathogenic&quot; ]) / nrow(vto)
+  P2 &lt;- nrow(vto[Pathogenicity == &quot;Pathogenic&quot; &amp;  var_type == &quot;Coding&quot; &amp; AS_PVALUE &lt; 0.05 &amp;  Abs_effect_size &gt; t]) / 
+    (nrow(vto[var_type == &quot;Coding&quot; &amp; AS_PVALUE &lt; 0.05 &amp; Abs_effect_size &gt; t]) +1 )
+  
+  df &lt;- data.frame(&quot;Type&quot; = &quot;FC&quot;,
+                   &quot;Variant_type&quot; = &quot;Coding&quot;,
+                   &quot;Threshold&quot; = t,
+                   &quot;OddsPath&quot; = (P2 * (1 - P1) ) / ((1 - P2) * P1 ) )
+  
+  t_iter &lt;- rbind(t_iter, df)
+  
+  ### Non-coding
+  P1 &lt;- nrow(vto[Pathogenicity == &quot;Pathogenic&quot; ]) / nrow(vto)
+  P2 &lt;- nrow(vto[Pathogenicity == &quot;Pathogenic&quot; &amp;  var_type == &quot;Non-coding&quot; &amp; AS_PVALUE &lt; 0.05 &amp;  Abs_effect_size &gt; t]) / 
+    (nrow(vto[var_type == &quot;Non-coding&quot; &amp; AS_PVALUE &lt; 0.05 &amp; Abs_effect_size &gt; t]) +1 )
+  
+  df &lt;- data.frame(&quot;Type&quot; = &quot;FC&quot;,
+                   &quot;Variant_type&quot; = &quot;Non-coding&quot;,
+                   &quot;Threshold&quot; = t,
+                   &quot;OddsPath&quot; = (P2 * (1 - P1) ) / ((1 - P2) * P1 ) )
+  
+  t_iter &lt;- rbind(t_iter, df)
+  
+  ### Splice
+  P1 &lt;- nrow(vto[Pathogenicity == &quot;Pathogenic&quot; ]) / nrow(vto)
+  P2 &lt;- nrow(vto[Pathogenicity == &quot;Pathogenic&quot; &amp;  var_type == &quot;Splice&quot; &amp;  AS_PVALUE &lt; 0.05 &amp; Abs_effect_size &gt; t]) / 
+    (nrow(vto[var_type == &quot;Splice&quot; &amp; AS_PVALUE &lt; 0.05 &amp; Abs_effect_size &gt; t]) +1 )
+  
+  df &lt;- data.frame(&quot;Type&quot; = &quot;FC&quot;,
+                   &quot;Variant_type&quot; = &quot;Splice&quot;,
+                   &quot;Threshold&quot; = t,
+                   &quot;OddsPath&quot; = (P2 * (1 - P1) ) / ((1 - P2) * P1 ) )
+  
+  t_iter &lt;- rbind(t_iter, df)
+}
+t_iter &lt;- as.data.table(t_iter)
+t_iter[  OddsPath &lt;= 2.1 , &quot;Evidence_strength&quot; :=  &quot;Indeterminate&quot; ]
+t_iter[  OddsPath &gt; 2.1 , &quot;Evidence_strength&quot; :=  &quot;PS3 supporting&quot; ]
+t_iter[  OddsPath &gt; 4.3 , &quot;Evidence_strength&quot; :=  &quot;PS3 moderate&quot; ]
+t_iter[  OddsPath &gt; 18.7 , &quot;Evidence_strength&quot; :=  &quot;PS3 strong&quot; ]
+t_iter[  OddsPath &gt; 350 , &quot;Evidence_strength&quot; :=  &quot;PS3 very strong&quot; ]
+t_iter$Evidence_strength &lt;- factor(t_iter$Evidence_strength, 
+                                   levels= c(&quot;Indeterminate&quot;, &quot;PS3 supporting&quot;,
+                                             &quot;PS3 moderate&quot;, &quot;PS3 strong&quot;, &quot;PS3 very strong&quot;))
+
+p1 &lt;- ggplot(vto, aes(var_type, Abs_effect_size) )+
+  geom_quasirandom(aes(fill = Pathogenicity, shape = genotype, size = Significance), color = &quot;grey20&quot;)+
+  scale_shape_manual(values = gene_shapes, guide = guide_legend(override.aes = list(fill = &quot;black&quot;, size = 3, order = 1)) ) +
+  scale_fill_manual(values = outlier_colors, guide = guide_legend(override.aes = list(shape = 23, size = 3, order = 2))) +
+  scale_size_manual(values = gene_size) +
+  xlab(&quot;&quot;) + 
+  ylab(&quot;Aberrant splicing\n|effect size|&quot;) +
+  labs(fill = &quot;Pathogenicity&quot;, 
+       size = &quot;Significance&quot;,
+       shape = &quot;Genotype&quot;)+  
+  #geom_hline(yintercept = 0)+
+  geom_hline(yintercept = 0.3, linetype = &quot;dashed&quot;, color = &quot;red&quot;)+
+  scale_y_continuous(breaks=c(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7))+
+  theme_classic()+
+  theme(axis.title.y= element_text( size=12,  face=&quot;bold&quot;),
+        axis.title.x= element_text( size=12,  face=&quot;bold&quot;),
+        axis.text.x = element_text(face=&quot;bold&quot;,  size=12),
+        axis.text.y= element_text(face=&quot;bold&quot;,  size=12))
+
+
+p2 &lt;- ggplot(t_iter[ Threshold &gt;= 0.1 &amp; Threshold &lt; 0.65], aes(Threshold, OddsPath))+
+  geom_vline(xintercept = 0.3, linetype = &quot;dashed&quot;, color = &quot;red&quot;)+
+  
+  geom_hline(yintercept = 2.1, linetype = &quot;dashed&quot;)+
+  geom_hline(yintercept = 4.3, linetype = &quot;dashed&quot;)+
+  geom_hline(yintercept = 18.7, linetype = &quot;dashed&quot;)+
+  # geom_hline(yintercept = 350, linetype = &quot;dashed&quot;)+
+  
+  geom_line(aes(colour = Variant_type),size = 1.1)+
+  geom_point(aes(fill = Variant_type, shape = Evidence_strength), size = 3, colour = &quot;grey20&quot;)+
+  xlab(&quot;|effect size| threshold of\nominaly significant aberrant splicing&quot;) + 
+  ylab(&quot;Odds of pathogenicity (OddsPath)&quot;) +
+  labs(fill = &quot;Variant type&quot;, 
+       colour = &quot;Variant type&quot;, 
+       shape = &quot;Evidence strength\nequivalent&quot;)+  
+  scale_color_brewer(palette = &quot;Pastel2&quot;)+
+  scale_fill_brewer(palette = &quot;Pastel2&quot;)+
+  #scale_fill_manual(values = variant_colors) +
+  scale_shape_manual(values = evidence_shape ) +
+  scale_x_continuous(breaks=c(0.1, 0.2, 0.3, 0.4, 0.5, 0.6), label=c(&quot;&gt;0.1&quot;, &quot;&gt;0.2&quot;, &quot;&gt;0.3&quot;, &quot;&gt;0.4&quot;, &quot;&gt;0.5&quot;, &quot;&gt;0.6&quot;))+
+  guides(fill=FALSE)+
+  
+  theme_classic()+
+  theme(axis.title.y= element_text( size=12,  face=&quot;bold&quot;),
+        axis.title.x= element_text( size=12,  face=&quot;bold&quot;),
+        axis.text.x = element_text(face=&quot;bold&quot;,  size=12),
+        axis.text.y= element_text(face=&quot;bold&quot;,  size=12))
+
+p6 &lt;- p1 + p2 + plot_annotation(tag_levels = &#39;a&#39;) &amp; 
+  theme(plot.tag = element_text( size=14,  face=&quot;bold&quot;))</code></pre>
+<pre class="r"><code>p6</code></pre>
+<p><img src="Scripts_RNA_seq_Aberrant_splicing_files/figure-html/unnamed-chunk-3-1.png" width="960" /></p>
+<pre class="r"><code>######
+# effect size + FDR
+vto[, Abs_effect_size := abs(deltaPsi) ]
+thresholds &lt;- seq(0, 0.65, 0.05)
+
+t_iter &lt;- data.frame()
+for (t in thresholds){
+  ### All
+  P1 &lt;- nrow(vto[Pathogenicity == &quot;Pathogenic&quot; ]) / nrow(vto)
+  P2 &lt;- nrow(vto[Pathogenicity == &quot;Pathogenic&quot; &amp; AS_PADJ &lt; 0.1 &amp; Abs_effect_size &gt; t]) / 
+    (nrow(vto[AS_PADJ &lt; 0.1 &amp;  Abs_effect_size &gt; t]) +1 )
+  
+  df &lt;- data.frame(&quot;Type&quot; = &quot;FC&quot;,
+                   &quot;Variant_type&quot; = &quot;All&quot;,
+                   &quot;Threshold&quot; = t,
+                   &quot;OddsPath&quot; = (P2 * (1 - P1) ) / ((1 - P2) * P1 ) )
+  
+  t_iter &lt;- rbind(t_iter, df)
+  
+  ### PTV
+  P1 &lt;- nrow(vto[Pathogenicity == &quot;Pathogenic&quot; ]) / nrow(vto)
+  P2 &lt;- nrow(vto[Pathogenicity == &quot;Pathogenic&quot; &amp;  var_type == &quot;PTV&quot; &amp; AS_PADJ &lt; 0.1 &amp;  Abs_effect_size &gt; t]) / 
+    (nrow(vto[var_type == &quot;PTV&quot; &amp; AS_PADJ &lt; 0.1 &amp; Abs_effect_size &gt; t]) +1 )
+  
+  df &lt;- data.frame(&quot;Type&quot; = &quot;FC&quot;,
+                   &quot;Variant_type&quot; = &quot;PTV&quot;,
+                   &quot;Threshold&quot; = t,
+                   &quot;OddsPath&quot; = (P2 * (1 - P1) ) / ((1 - P2) * P1 ) )
+  
+  t_iter &lt;- rbind(t_iter, df)
+  
+  ### Coding
+  P1 &lt;- nrow(vto[Pathogenicity == &quot;Pathogenic&quot; ]) / nrow(vto)
+  P2 &lt;- nrow(vto[Pathogenicity == &quot;Pathogenic&quot; &amp;  var_type == &quot;Coding&quot; &amp; AS_PADJ &lt; 0.1 &amp;  Abs_effect_size &gt; t]) / 
+    (nrow(vto[var_type == &quot;Coding&quot; &amp; AS_PADJ &lt; 0.1 &amp; Abs_effect_size &gt; t]) +1 )
+  
+  df &lt;- data.frame(&quot;Type&quot; = &quot;FC&quot;,
+                   &quot;Variant_type&quot; = &quot;Coding&quot;,
+                   &quot;Threshold&quot; = t,
+                   &quot;OddsPath&quot; = (P2 * (1 - P1) ) / ((1 - P2) * P1 ) )
+  
+  t_iter &lt;- rbind(t_iter, df)
+  
+  ### Non-coding
+  P1 &lt;- nrow(vto[Pathogenicity == &quot;Pathogenic&quot; ]) / nrow(vto)
+  P2 &lt;- nrow(vto[Pathogenicity == &quot;Pathogenic&quot; &amp;  var_type == &quot;Non-coding&quot; &amp; AS_PADJ &lt; 0.1 &amp;  Abs_effect_size &gt; t]) / 
+    (nrow(vto[var_type == &quot;Non-coding&quot; &amp; AS_PADJ &lt; 0.1 &amp; Abs_effect_size &gt; t]) +1 )
+  
+  df &lt;- data.frame(&quot;Type&quot; = &quot;FC&quot;,
+                   &quot;Variant_type&quot; = &quot;Non-coding&quot;,
+                   &quot;Threshold&quot; = t,
+                   &quot;OddsPath&quot; = (P2 * (1 - P1) ) / ((1 - P2) * P1 ) )
+  
+  t_iter &lt;- rbind(t_iter, df)
+  
+  ### Splice
+  P1 &lt;- nrow(vto[Pathogenicity == &quot;Pathogenic&quot; ]) / nrow(vto)
+  P2 &lt;- nrow(vto[Pathogenicity == &quot;Pathogenic&quot; &amp;  var_type == &quot;Splice&quot; &amp;  AS_PADJ &lt; 0.1 &amp; Abs_effect_size &gt; t]) / 
+    (nrow(vto[var_type == &quot;Splice&quot; &amp; AS_PADJ &lt; 0.1 &amp; Abs_effect_size &gt; t]) +1 )
+  
+  df &lt;- data.frame(&quot;Type&quot; = &quot;FC&quot;,
+                   &quot;Variant_type&quot; = &quot;Splice&quot;,
+                   &quot;Threshold&quot; = t,
+                   &quot;OddsPath&quot; = (P2 * (1 - P1) ) / ((1 - P2) * P1 ) )
+  
+  t_iter &lt;- rbind(t_iter, df)
+}
+t_iter &lt;- as.data.table(t_iter)
+t_iter[  OddsPath &lt;= 2.1 , &quot;Evidence_strength&quot; :=  &quot;Indeterminate&quot; ]
+t_iter[  OddsPath &gt; 2.1 , &quot;Evidence_strength&quot; :=  &quot;PS3 supporting&quot; ]
+t_iter[  OddsPath &gt; 4.3 , &quot;Evidence_strength&quot; :=  &quot;PS3 moderate&quot; ]
+t_iter[  OddsPath &gt; 18.7 , &quot;Evidence_strength&quot; :=  &quot;PS3 strong&quot; ]
+t_iter[  OddsPath &gt; 350 , &quot;Evidence_strength&quot; :=  &quot;PS3 very strong&quot; ]
+t_iter$Evidence_strength &lt;- factor(t_iter$Evidence_strength, 
+                                   levels= c(&quot;Indeterminate&quot;, &quot;PS3 supporting&quot;,
+                                             &quot;PS3 moderate&quot;, &quot;PS3 strong&quot;, &quot;PS3 very strong&quot;))
+
+p1 &lt;- ggplot(vto, aes(var_type, Abs_effect_size) )+
+  geom_quasirandom(aes(fill = Pathogenicity, shape = genotype, size = Significance), color = &quot;grey20&quot;)+
+  scale_shape_manual(values = gene_shapes, guide = guide_legend(override.aes = list(fill = &quot;black&quot;, size = 3, order = 1)) ) +
+  scale_fill_manual(values = outlier_colors, guide = guide_legend(override.aes = list(shape = 23, size = 3, order = 2))) +
+  scale_size_manual(values = gene_size) +
+  xlab(&quot;&quot;) + 
+  ylab(&quot;Aberrant splicing\n|effect size|&quot;) +
+  labs(fill = &quot;Pathogenicity&quot;, 
+       size = &quot;Significance&quot;,
+       shape = &quot;Genotype&quot;)+  
+  #geom_hline(yintercept = 0)+
+  geom_hline(yintercept = 0.3, linetype = &quot;dashed&quot;)+
+  theme_classic()+
+  theme(axis.title.y= element_text( size=12,  face=&quot;bold&quot;),
+        axis.title.x= element_text( size=12,  face=&quot;bold&quot;),
+        axis.text.x = element_text(face=&quot;bold&quot;,  size=12),
+        axis.text.y= element_text(face=&quot;bold&quot;,  size=12))</code></pre>
+<div id="oddspath-for-effect-size-thresholds-of-fdr-significant-fdr-0.1-aberrant-splicing" class="section level2">
+<h2>OddsPath for |effect size| thresholds of FDR significant (FDR &lt; 0.1) aberrant splicing</h2>
+<pre class="r"><code>p2 &lt;- ggplot(t_iter[ Threshold &gt;= 0.1 &amp; Threshold &lt; 0.65], aes(Threshold, OddsPath))+
+  geom_vline(xintercept = 0.3, linetype = &quot;dashed&quot;)+
+  
+  geom_hline(yintercept = 2.1, linetype = &quot;dashed&quot;)+
+  geom_hline(yintercept = 4.3, linetype = &quot;dashed&quot;)+
+  geom_hline(yintercept = 18.7, linetype = &quot;dashed&quot;)+
+  # geom_hline(yintercept = 350, linetype = &quot;dashed&quot;)+
+  
+  geom_line(aes(colour = Variant_type),size = 1.1)+
+  geom_point(aes(fill = Variant_type, shape = Evidence_strength), size = 3, colour = &quot;grey20&quot;)+
+  xlab(&quot;|effect size| threshold of\nFDR significant aberrant splicing&quot;) + 
+  ylab(&quot;\nOdds of pathogenicity (OddsPath)&quot;) +
+  labs(fill = &quot;Variant type&quot;, 
+       colour = &quot;Variant type&quot;, 
+       shape = &quot;Evidence strength\nequivalent&quot;)+  
+  scale_color_brewer(palette = &quot;Pastel2&quot;)+
+  scale_fill_brewer(palette = &quot;Pastel2&quot;)+
+  #scale_fill_manual(values = variant_colors) +
+  scale_shape_manual(values = evidence_shape ) +
+  scale_x_continuous(breaks=c(0.1, 0.2, 0.3, 0.4, 0.5, 0.6), label=c(&quot;&gt;0.1&quot;, &quot;&gt;0.2&quot;, &quot;&gt;0.3&quot;, &quot;&gt;0.4&quot;, &quot;&gt;0.5&quot;, &quot;&gt;0.6&quot;))+
+  guides(fill=FALSE)+
+  
+  theme_classic()+
+  theme(axis.title.y= element_text( size=12,  face=&quot;bold&quot;),
+        axis.title.x= element_text( size=12,  face=&quot;bold&quot;),
+        axis.text.x = element_text(face=&quot;bold&quot;,  size=12),
+        axis.text.y= element_text(face=&quot;bold&quot;,  size=12))
+
+supp_as &lt;- p1 + p2  + plot_annotation(tag_levels = &#39;a&#39;) &amp; 
+  theme(plot.tag = element_text( size=14,  face=&quot;bold&quot;))</code></pre>
+<pre class="r"><code>supp_as</code></pre>
+<p><img src="Scripts_RNA_seq_Aberrant_splicing_files/figure-html/unnamed-chunk-5-1.png" width="960" /></p>
+<pre class="r"><code>###########################################################################
+##### P-value
+##################################################</code></pre>
+</div>
+<div id="oddspath-for-p-value-thresholds" class="section level2">
+<h2>OddsPath for p-value thresholds</h2>
+<pre class="r"><code>#### P-value iteration
+# thresholds &lt;- seq(0, 0.05, 0.001)
+thresholds &lt;- c(0, 10^-6, 10^-5, 10^-4, 0.001, 0.005, 0.05, 0.01, 0.1)
+t_iter &lt;- data.frame()
+for (t in thresholds){
+  ### All
+  P1 &lt;- nrow(vto[Pathogenicity == &quot;Pathogenic&quot; ]) / nrow(vto)
+  P2 &lt;- nrow(vto[Pathogenicity == &quot;Pathogenic&quot; &amp;  AS_PVALUE &lt; t]) / 
+    (nrow(vto[ AS_PVALUE &lt; t]) +1 )
+  
+  df &lt;- data.frame(&quot;Type&quot; = &quot;P-value&quot;,
+                   &quot;Variant_type&quot; = &quot;All&quot;,
+                   &quot;Threshold&quot; = t,
+                   &quot;OddsPath&quot; = (P2 * (1 - P1) ) / ((1 - P2) * P1 ) )
+  
+  t_iter &lt;- rbind(t_iter, df)
+  
+  ### PTV
+  P1 &lt;- nrow(vto[Pathogenicity == &quot;Pathogenic&quot; ]) / nrow(vto)
+  P2 &lt;- nrow(vto[Pathogenicity == &quot;Pathogenic&quot; &amp;  var_type == &quot;PTV&quot; &amp;  AS_PVALUE &lt; t]) / 
+    (nrow(vto[var_type == &quot;PTV&quot; &amp; AS_PVALUE &lt; t]) +1 )
+  
+  df &lt;- data.frame(&quot;Type&quot; = &quot;P-value&quot;,
+                   &quot;Variant_type&quot; = &quot;PTV&quot;,
+                   &quot;Threshold&quot; = t,
+                   &quot;OddsPath&quot; = (P2 * (1 - P1) ) / ((1 - P2) * P1 ) )
+  
+  t_iter &lt;- rbind(t_iter, df)
+  
+  ### Coding
+  P1 &lt;- nrow(vto[Pathogenicity == &quot;Pathogenic&quot; ]) / nrow(vto)
+  P2 &lt;- nrow(vto[Pathogenicity == &quot;Pathogenic&quot; &amp;  var_type == &quot;Coding&quot; &amp; AS_PVALUE &lt; t]) / 
+    (nrow(vto[var_type == &quot;Coding&quot; &amp; AS_PVALUE &lt; t]) +1 )
+  
+  df &lt;- data.frame(&quot;Type&quot; = &quot;P-value&quot;,
+                   &quot;Variant_type&quot; = &quot;Coding&quot;,
+                   &quot;Threshold&quot; = t,
+                   &quot;OddsPath&quot; = (P2 * (1 - P1) ) / ((1 - P2) * P1 ) )
+  
+  t_iter &lt;- rbind(t_iter, df)
+  
+  ### Non-coding
+  P1 &lt;- nrow(vto[Pathogenicity == &quot;Pathogenic&quot; ]) / nrow(vto)
+  P2 &lt;- nrow(vto[Pathogenicity == &quot;Pathogenic&quot; &amp;  var_type == &quot;Non-coding&quot; &amp;  AS_PVALUE &lt; t]) / 
+    (nrow(vto[var_type == &quot;Non-coding&quot; &amp; AS_PVALUE &lt; t]) +1 )
+  
+  df &lt;- data.frame(&quot;Type&quot; = &quot;P-value&quot;,
+                   &quot;Variant_type&quot; = &quot;Non-coding&quot;,
+                   &quot;Threshold&quot; = t,
+                   &quot;OddsPath&quot; = (P2 * (1 - P1) ) / ((1 - P2) * P1 ) )
+  
+  t_iter &lt;- rbind(t_iter, df)
+  
+  ### Splice
+  P1 &lt;- nrow(vto[Pathogenicity == &quot;Pathogenic&quot; ]) / nrow(vto)
+  P2 &lt;- nrow(vto[Pathogenicity == &quot;Pathogenic&quot; &amp;  var_type == &quot;Splice&quot; &amp;  AS_PVALUE &lt; t]) / 
+    (nrow(vto[var_type == &quot;Splice&quot; &amp; AS_PVALUE &lt; t]) +1 )
+  
+  df &lt;- data.frame(&quot;Type&quot; = &quot;P-value&quot;,
+                   &quot;Variant_type&quot; = &quot;Splice&quot;,
+                   &quot;Threshold&quot; = t,
+                   &quot;OddsPath&quot; = (P2 * (1 - P1) ) / ((1 - P2) * P1 ) )
+  
+  t_iter &lt;- rbind(t_iter, df)
+}
+t_iter &lt;- as.data.table(t_iter)
+t_iter[  OddsPath &lt;= 2.1 , &quot;Evidence_strength&quot; :=  &quot;Indeterminate&quot; ]
+t_iter[  OddsPath &gt; 2.1 , &quot;Evidence_strength&quot; :=  &quot;PS3 supporting&quot; ]
+t_iter[  OddsPath &gt; 4.3 , &quot;Evidence_strength&quot; :=  &quot;PS3 moderate&quot; ]
+t_iter[  OddsPath &gt; 18.7 , &quot;Evidence_strength&quot; :=  &quot;PS3 strong&quot; ]
+t_iter[  OddsPath &gt; 350 , &quot;Evidence_strength&quot; :=  &quot;PS3 very strong&quot; ]
+t_iter$Evidence_strength &lt;- factor(t_iter$Evidence_strength, 
+                                   levels= c(&quot;Indeterminate&quot;, &quot;PS3 supporting&quot;,
+                                             &quot;PS3 moderate&quot;, &quot;PS3 strong&quot;, &quot;PS3 very strong&quot;))</code></pre>
+<pre class="r"><code>ggplot(t_iter[Threshold &gt; 0], aes(Threshold, OddsPath))+
+  #geom_vline(xintercept = 0)+
+  geom_vline(xintercept = 0.01, linetype = &quot;dashed&quot;)+
+  geom_vline(xintercept = 0.05, linetype = &quot;dashed&quot;)+
+  
+  geom_hline(yintercept = 2.1, linetype = &quot;dashed&quot;)+
+  geom_hline(yintercept = 4.3, linetype = &quot;dashed&quot;)+
+  geom_hline(yintercept = 18.7, linetype = &quot;dashed&quot;)+
+  # geom_hline(yintercept = 350, linetype = &quot;dashed&quot;)+
+  
+  geom_line(aes(colour = Variant_type), size = 1.1)+
+  geom_point(aes(fill = Variant_type, shape = Evidence_strength), size = 3, colour = &quot;grey20&quot;)+
+  xlab(&quot;p-value threshold&quot;) + 
+  ylab(&quot;Odds of pathogenicity (OddsPath)&quot;) +
+  labs(fill = &quot;Variant type&quot;, 
+       colour = &quot;Variant type&quot;, 
+       shape = &quot;Evidence strength\nequivalent&quot;)+  
+  scale_color_brewer(palette = &quot;Pastel2&quot;)+
+  scale_fill_brewer(palette = &quot;Pastel2&quot;)+
+  guides(fill=FALSE)+
+  #scale_fill_manual(values = variant_colors) +
+  scale_shape_manual(values = evidence_shape ) +
+  scale_x_log10(breaks = trans_breaks(&quot;log10&quot;, function(x) 10^x),
+                labels = trans_format(&quot;log10&quot;, math_format(10^.x)))+
+  theme_classic()+
+  theme(axis.title.y= element_text( size=12,  face=&quot;bold&quot;),
+        axis.title.x= element_text( size=12,  face=&quot;bold&quot;),
+        axis.text.x = element_text(face=&quot;bold&quot;,  size=12),
+        axis.text.y= element_text(face=&quot;bold&quot;,  size=12))</code></pre>
+<p><img src="Scripts_RNA_seq_Aberrant_splicing_files/figure-html/unnamed-chunk-7-1.png" width="960" /></p>
+</div>
+<div id="oddspath-for-fdr-thresholds" class="section level2">
+<h2>OddsPath for FDR thresholds</h2>
+<pre class="r"><code>thresholds &lt;- seq(0, 1, 0.01)
+t_iter &lt;- data.frame()
+for (t in thresholds){
+  ### All
+  P1 &lt;- nrow(vto[Pathogenicity == &quot;Pathogenic&quot; ]) / nrow(vto)
+  P2 &lt;- nrow(vto[Pathogenicity == &quot;Pathogenic&quot; &amp;  AS_PADJ &lt; t]) / 
+    (nrow(vto[ AS_PADJ &lt; t]) +1 )
+  
+  df &lt;- data.frame(&quot;Type&quot; = &quot;P-value&quot;,
+                   &quot;Variant_type&quot; = &quot;All&quot;,
+                   &quot;Threshold&quot; = t,
+                   &quot;OddsPath&quot; = (P2 * (1 - P1) ) / ((1 - P2) * P1 ) )
+  
+  t_iter &lt;- rbind(t_iter, df)
+  
+  ### PTV
+  P1 &lt;- nrow(vto[Pathogenicity == &quot;Pathogenic&quot; ]) / nrow(vto)
+  P2 &lt;- nrow(vto[Pathogenicity == &quot;Pathogenic&quot; &amp;  var_type == &quot;PTV&quot; &amp;  AS_PADJ &lt; t]) / 
+    (nrow(vto[var_type == &quot;PTV&quot; &amp; AS_PADJ &lt; t]) +1 )
+  
+  df &lt;- data.frame(&quot;Type&quot; = &quot;P-value&quot;,
+                   &quot;Variant_type&quot; = &quot;PTV&quot;,
+                   &quot;Threshold&quot; = t,
+                   &quot;OddsPath&quot; = (P2 * (1 - P1) ) / ((1 - P2) * P1 ) )
+  
+  t_iter &lt;- rbind(t_iter, df)
+  
+  ### Coding
+  P1 &lt;- nrow(vto[Pathogenicity == &quot;Pathogenic&quot; ]) / nrow(vto)
+  P2 &lt;- nrow(vto[Pathogenicity == &quot;Pathogenic&quot; &amp;  var_type == &quot;Coding&quot; &amp; AS_PADJ &lt; t]) / 
+    (nrow(vto[var_type == &quot;Coding&quot; &amp; AS_PADJ &lt; t]) +1 )
+  
+  df &lt;- data.frame(&quot;Type&quot; = &quot;P-value&quot;,
+                   &quot;Variant_type&quot; = &quot;Coding&quot;,
+                   &quot;Threshold&quot; = t,
+                   &quot;OddsPath&quot; = (P2 * (1 - P1) ) / ((1 - P2) * P1 ) )
+  
+  t_iter &lt;- rbind(t_iter, df)
+  
+  ### Non-coding
+  P1 &lt;- nrow(vto[Pathogenicity == &quot;Pathogenic&quot; ]) / nrow(vto)
+  P2 &lt;- nrow(vto[Pathogenicity == &quot;Pathogenic&quot; &amp;  var_type == &quot;Non-coding&quot; &amp;  AS_PADJ &lt; t]) / 
+    (nrow(vto[var_type == &quot;Non-coding&quot; &amp; AS_PADJ &lt; t]) +1 )
+  
+  df &lt;- data.frame(&quot;Type&quot; = &quot;P-value&quot;,
+                   &quot;Variant_type&quot; = &quot;Non-coding&quot;,
+                   &quot;Threshold&quot; = t,
+                   &quot;OddsPath&quot; = (P2 * (1 - P1) ) / ((1 - P2) * P1 ) )
+  
+  t_iter &lt;- rbind(t_iter, df)
+  
+  ### Splice
+  P1 &lt;- nrow(vto[Pathogenicity == &quot;Pathogenic&quot; ]) / nrow(vto)
+  P2 &lt;- nrow(vto[Pathogenicity == &quot;Pathogenic&quot; &amp;  var_type == &quot;Splice&quot; &amp;  AS_PADJ &lt; t]) / 
+    (nrow(vto[var_type == &quot;Splice&quot; &amp; AS_PADJ &lt; t]) +1 )
+  
+  df &lt;- data.frame(&quot;Type&quot; = &quot;P-value&quot;,
+                   &quot;Variant_type&quot; = &quot;Splice&quot;,
+                   &quot;Threshold&quot; = t,
+                   &quot;OddsPath&quot; = (P2 * (1 - P1) ) / ((1 - P2) * P1 ) )
+  
+  t_iter &lt;- rbind(t_iter, df)
+}
+t_iter &lt;- as.data.table(t_iter)
+t_iter[  OddsPath &lt;= 2.1 , &quot;Evidence_strength&quot; :=  &quot;Indeterminate&quot; ]
+t_iter[  OddsPath &gt; 2.1 , &quot;Evidence_strength&quot; :=  &quot;PS3 supporting&quot; ]
+t_iter[  OddsPath &gt; 4.3 , &quot;Evidence_strength&quot; :=  &quot;PS3 moderate&quot; ]
+t_iter[  OddsPath &gt; 18.7 , &quot;Evidence_strength&quot; :=  &quot;PS3 strong&quot; ]
+t_iter[  OddsPath &gt; 350 , &quot;Evidence_strength&quot; :=  &quot;PS3 very strong&quot; ]
+t_iter$Evidence_strength &lt;- factor(t_iter$Evidence_strength, 
+                                   levels= c(&quot;Indeterminate&quot;, &quot;PS3 supporting&quot;,
+                                             &quot;PS3 moderate&quot;, &quot;PS3 strong&quot;, &quot;PS3 very strong&quot;))</code></pre>
+<pre class="r"><code>ggplot(t_iter[Threshold &gt; 0], aes(Threshold, OddsPath))+
+  #geom_vline(xintercept = 0)+
+  geom_vline(xintercept = 0.01, linetype = &quot;dashed&quot;)+
+  geom_vline(xintercept = 0.05, linetype = &quot;dashed&quot;)+
+  
+  geom_hline(yintercept = 2.1, linetype = &quot;dashed&quot;)+
+  geom_hline(yintercept = 4.3, linetype = &quot;dashed&quot;)+
+  geom_hline(yintercept = 18.7, linetype = &quot;dashed&quot;)+
+  # geom_hline(yintercept = 350, linetype = &quot;dashed&quot;)+
+  
+  geom_line(aes(colour = Variant_type), size = 1.1)+
+  geom_point(aes(fill = Variant_type, shape = Evidence_strength), size = 3, colour = &quot;grey20&quot;)+
+  xlab(&quot;FDR threshold&quot;) + 
+  ylab(&quot;Odds of pathogenicity (OddsPath)&quot;) +
+  labs(fill = &quot;Variant type&quot;, 
+       colour = &quot;Variant type&quot;, 
+       shape = &quot;Evidence strength\nequivalent&quot;)+  
+  scale_color_brewer(palette = &quot;Pastel2&quot;)+
+  scale_fill_brewer(palette = &quot;Pastel2&quot;)+
+  guides(fill=FALSE)+
+  #scale_fill_manual(values = variant_colors) +
+  scale_shape_manual(values = evidence_shape ) +
+  theme_classic()+
+  theme(axis.title.y= element_text( size=12,  face=&quot;bold&quot;),
+        axis.title.x= element_text( size=12,  face=&quot;bold&quot;),
+        axis.text.x = element_text(face=&quot;bold&quot;,  size=12),
+        axis.text.y= element_text(face=&quot;bold&quot;,  size=12))</code></pre>
+<p><img src="Scripts_RNA_seq_Aberrant_splicing_files/figure-html/unnamed-chunk-9-1.png" width="960" /></p>
+<pre class="r"><code>#############################################################################################</code></pre>
+</div>
+</div>
+<div id="benign-functional-evidence" class="section level1">
+<h1>Benign functional evidence</h1>
+<div id="oddspath-for-p-value-thresholds-1" class="section level2">
+<h2>OddsPath for p-value thresholds</h2>
+<pre class="r"><code># thresholds &lt;- seq(0, 0.05, 0.001)
+thresholds &lt;- c(0, 10^-6, 10^-5, 10^-4, 0.001, 0.005, 0.05, 0.01, 0.1, 0.2)
+t_iter &lt;- data.frame()
+for (t in thresholds){
+  ### All
+  P1 &lt;- nrow(vto[Pathogenicity == &quot;Pathogenic&quot; ]) / nrow(vto)
+  P2 &lt;- nrow(vto[Pathogenicity == &quot;Pathogenic&quot; &amp;  AS_PVALUE &gt; t]) / 
+    (nrow(vto[ AS_PVALUE &gt; t]) +1 )
+  
+  df &lt;- data.frame(&quot;Type&quot; = &quot;P-value&quot;,
+                   &quot;Variant_type&quot; = &quot;All&quot;,
+                   &quot;Threshold&quot; = t,
+                   &quot;OddsPath&quot; = (P2 * (1 - P1) ) / ((1 - P2) * P1 ) )
+  
+  t_iter &lt;- rbind(t_iter, df)
+  
+  ### PTV
+  P1 &lt;- nrow(vto[Pathogenicity == &quot;Pathogenic&quot; ]) / nrow(vto)
+  P2 &lt;- nrow(vto[Pathogenicity == &quot;Pathogenic&quot; &amp;  var_type == &quot;PTV&quot; &amp;  AS_PVALUE  &gt; t]) / 
+    (nrow(vto[var_type == &quot;PTV&quot; &amp; AS_PVALUE  &gt; t]) +1 )
+  
+  df &lt;- data.frame(&quot;Type&quot; = &quot;P-value&quot;,
+                   &quot;Variant_type&quot; = &quot;PTV&quot;,
+                   &quot;Threshold&quot; = t,
+                   &quot;OddsPath&quot; = (P2 * (1 - P1) ) / ((1 - P2) * P1 ) )
+  
+  t_iter &lt;- rbind(t_iter, df)
+  
+  ### Coding
+  P1 &lt;- nrow(vto[Pathogenicity == &quot;Pathogenic&quot; ]) / nrow(vto)
+  P2 &lt;- nrow(vto[Pathogenicity == &quot;Pathogenic&quot; &amp;  var_type == &quot;Coding&quot; &amp; AS_PVALUE  &gt; t]) / 
+    (nrow(vto[var_type == &quot;Coding&quot; &amp; AS_PVALUE  &gt; t]) +1 )
+  
+  df &lt;- data.frame(&quot;Type&quot; = &quot;P-value&quot;,
+                   &quot;Variant_type&quot; = &quot;Coding&quot;,
+                   &quot;Threshold&quot; = t,
+                   &quot;OddsPath&quot; = (P2 * (1 - P1) ) / ((1 - P2) * P1 ) )
+  
+  t_iter &lt;- rbind(t_iter, df)
+  
+  ### Non-coding
+  P1 &lt;- nrow(vto[Pathogenicity == &quot;Pathogenic&quot; ]) / nrow(vto)
+  P2 &lt;- nrow(vto[Pathogenicity == &quot;Pathogenic&quot; &amp;  var_type == &quot;Non-coding&quot; &amp;  AS_PVALUE &gt; t]) / 
+    (nrow(vto[var_type == &quot;Non-coding&quot; &amp; AS_PVALUE  &gt; t]) +1 )
+  
+  df &lt;- data.frame(&quot;Type&quot; = &quot;P-value&quot;,
+                   &quot;Variant_type&quot; = &quot;Non-coding&quot;,
+                   &quot;Threshold&quot; = t,
+                   &quot;OddsPath&quot; = (P2 * (1 - P1) ) / ((1 - P2) * P1 ) )
+  
+  t_iter &lt;- rbind(t_iter, df)
+  
+  ### Splice
+  P1 &lt;- nrow(vto[Pathogenicity == &quot;Pathogenic&quot; ]) / nrow(vto)
+  P2 &lt;- nrow(vto[Pathogenicity == &quot;Pathogenic&quot; &amp;  var_type == &quot;Splice&quot; &amp;  AS_PVALUE &gt; t]) / 
+    (nrow(vto[var_type == &quot;Splice&quot; &amp; AS_PVALUE &gt; t]) +1 )
+  
+  df &lt;- data.frame(&quot;Type&quot; = &quot;P-value&quot;,
+                   &quot;Variant_type&quot; = &quot;Splice&quot;,
+                   &quot;Threshold&quot; = t,
+                   &quot;OddsPath&quot; = (P2 * (1 - P1) ) / ((1 - P2) * P1 ) )
+  
+  t_iter &lt;- rbind(t_iter, df)
+}
+t_iter &lt;- as.data.table(t_iter)
+t_iter[  OddsPath &gt;= 0.48 , &quot;Evidence_strength&quot; :=  &quot;Indeterminate&quot; ]
+t_iter[  OddsPath &lt; 0.48 , &quot;Evidence_strength&quot; :=  &quot;BS3 supporting&quot; ]
+t_iter[  OddsPath &lt;0.23 , &quot;Evidence_strength&quot; :=  &quot;BS3 moderate&quot; ]
+t_iter[  OddsPath &lt;0.053 , &quot;Evidence_strength&quot; :=  &quot;BS3 strong&quot; ]
+t_iter[  OddsPath &lt; 0.0029 , &quot;Evidence_strength&quot; :=  &quot;BS3 very strong&quot; ]
+t_iter$Evidence_strength &lt;- factor(t_iter$Evidence_strength, 
+                                   levels= c(&quot;Indeterminate&quot;, &quot;BS3 supporting&quot;,
+                                             &quot;BS3 moderate&quot;, &quot;BS3 strong&quot;, &quot;BS3 very strong&quot;))</code></pre>
+<pre class="r"><code>ggplot(t_iter[Threshold &gt; 0], aes(Threshold, OddsPath))+
+  #geom_vline(xintercept = 0)+
+  #geom_vline(xintercept = 0.01, linetype = &quot;dashed&quot;)+
+  geom_vline(xintercept = 0.05, linetype = &quot;dashed&quot;)+
+  
+  geom_hline(yintercept = 0.48, linetype = &quot;dashed&quot;)+
+  geom_hline(yintercept = 0.23, linetype = &quot;dashed&quot;)+
+  geom_hline(yintercept = 0.053, linetype = &quot;dashed&quot;)+
+  # geom_hline(yintercept = 0.0029, linetype = &quot;dashed&quot;)+
+  
+  geom_line(aes(colour = Variant_type), size = 1.1)+
+  geom_point(aes(fill = Variant_type, shape = Evidence_strength), size = 3, colour = &quot;grey20&quot;)+
+  xlab(&quot;p-value threshold&quot;) + 
+  ylab(&quot;Odds of pathogenicity (OddsPath)&quot;) +
+  labs(fill = &quot;Variant type&quot;, 
+       colour = &quot;Variant type&quot;, 
+       shape = &quot;Evidence strength\nequivalent&quot;)+  
+  scale_color_brewer(palette = &quot;Pastel2&quot;)+
+  scale_fill_brewer(palette = &quot;Pastel2&quot;)+
+  guides(fill=FALSE)+
+  #scale_fill_manual(values = variant_colors) +
+  scale_shape_manual(values = evidence_shape ) +
+  scale_x_log10(breaks = trans_breaks(&quot;log10&quot;, function(x) 10^x),
+                labels = trans_format(&quot;log10&quot;, math_format(10^.x)))+
+  theme_classic()+
+  theme(axis.title.y= element_text( size=12,  face=&quot;bold&quot;),
+        axis.title.x= element_text( size=12,  face=&quot;bold&quot;),
+        axis.text.x = element_text(face=&quot;bold&quot;,  size=12),
+        axis.text.y= element_text(face=&quot;bold&quot;,  size=12))</code></pre>
+<p><img src="Scripts_RNA_seq_Aberrant_splicing_files/figure-html/unnamed-chunk-11-1.png" width="960" /></p>
+</div>
+<div id="oddspath-for-effect-size-for-nominal-significant-aberrant-splicing-p-value-0.05" class="section level2">
+<h2>OddsPath for effect size for nominal significant aberrant splicing (p-value &lt; 0.05)</h2>
+<pre class="r"><code>vto[, Abs_effect_size := abs(deltaPsi) ]
+thresholds &lt;- seq(0, 0.65, 0.05)
+
+t_iter &lt;- data.frame()
+for (t in thresholds){
+  ### All
+  P1 &lt;- nrow(vto[Pathogenicity == &quot;Pathogenic&quot; ]) / nrow(vto)
+  P2 &lt;- nrow(vto[Pathogenicity == &quot;Pathogenic&quot; &amp; AS_PVALUE &gt; 0.05 &amp; Abs_effect_size &lt; t]) / 
+    (nrow(vto[ AS_PVALUE &gt; 0.05 &amp; Abs_effect_size &lt; t]) +1 )
+  
+  df &lt;- data.frame(&quot;Type&quot; = &quot;FC&quot;,
+                   &quot;Variant_type&quot; = &quot;All&quot;,
+                   &quot;Threshold&quot; = t,
+                   &quot;OddsPath&quot; = (P2 * (1 - P1) ) / ((1 - P2) * P1 ) )
+  
+  t_iter &lt;- rbind(t_iter, df)
+  
+  ### PTV
+  P1 &lt;- nrow(vto[Pathogenicity == &quot;Pathogenic&quot; ]) / nrow(vto)
+  P2 &lt;- nrow(vto[Pathogenicity == &quot;Pathogenic&quot; &amp;  var_type == &quot;PTV&quot; &amp;  AS_PVALUE &gt; 0.05 &amp; Abs_effect_size &lt; t]) / 
+    (nrow(vto[var_type == &quot;PTV&quot; &amp;  AS_PVALUE &gt; 0.05 &amp; Abs_effect_size &lt; t]) +1 )
+  
+  df &lt;- data.frame(&quot;Type&quot; = &quot;FC&quot;,
+                   &quot;Variant_type&quot; = &quot;PTV&quot;,
+                   &quot;Threshold&quot; = t,
+                   &quot;OddsPath&quot; = (P2 * (1 - P1) ) / ((1 - P2) * P1 ) )
+  
+  t_iter &lt;- rbind(t_iter, df)
+  
+  ### Coding
+  P1 &lt;- nrow(vto[Pathogenicity == &quot;Pathogenic&quot; ]) / nrow(vto)
+  P2 &lt;- nrow(vto[Pathogenicity == &quot;Pathogenic&quot; &amp;  var_type == &quot;Coding&quot; &amp;  AS_PVALUE &gt; 0.05 &amp; Abs_effect_size &lt; t]) / 
+    (nrow(vto[var_type == &quot;Coding&quot; &amp;  AS_PVALUE &gt; 0.05 &amp; Abs_effect_size &lt; t]) +1 )
+  
+  df &lt;- data.frame(&quot;Type&quot; = &quot;FC&quot;,
+                   &quot;Variant_type&quot; = &quot;Coding&quot;,
+                   &quot;Threshold&quot; = t,
+                   &quot;OddsPath&quot; = (P2 * (1 - P1) ) / ((1 - P2) * P1 ) )
+  
+  t_iter &lt;- rbind(t_iter, df)
+  
+  ### Non-coding
+  P1 &lt;- nrow(vto[Pathogenicity == &quot;Pathogenic&quot; ]) / nrow(vto)
+  P2 &lt;- nrow(vto[Pathogenicity == &quot;Pathogenic&quot; &amp;  var_type == &quot;Non-coding&quot; &amp;  AS_PVALUE &gt; 0.05 &amp; Abs_effect_size &lt; t]) / 
+    (nrow(vto[var_type == &quot;Non-coding&quot; &amp;  AS_PVALUE &gt; 0.05 &amp; Abs_effect_size &lt; t]) +1 )
+  
+  df &lt;- data.frame(&quot;Type&quot; = &quot;FC&quot;,
+                   &quot;Variant_type&quot; = &quot;Non-coding&quot;,
+                   &quot;Threshold&quot; = t,
+                   &quot;OddsPath&quot; = (P2 * (1 - P1) ) / ((1 - P2) * P1 ) )
+  
+  t_iter &lt;- rbind(t_iter, df)
+  
+  ### Splice
+  P1 &lt;- nrow(vto[Pathogenicity == &quot;Pathogenic&quot; ]) / nrow(vto)
+  P2 &lt;- nrow(vto[Pathogenicity == &quot;Pathogenic&quot; &amp;  var_type == &quot;Splice&quot; &amp;   AS_PVALUE &gt; 0.05 &amp; Abs_effect_size &lt; t]) / 
+    (nrow(vto[var_type == &quot;Splice&quot; &amp;  AS_PVALUE &gt; 0.05 &amp; Abs_effect_size &lt; t]) +1 )
+  
+  df &lt;- data.frame(&quot;Type&quot; = &quot;FC&quot;,
+                   &quot;Variant_type&quot; = &quot;Splice&quot;,
+                   &quot;Threshold&quot; = t,
+                   &quot;OddsPath&quot; = (P2 * (1 - P1) ) / ((1 - P2) * P1 ) )
+  
+  t_iter &lt;- rbind(t_iter, df)
+}
+t_iter &lt;- as.data.table(t_iter)
+t_iter[  OddsPath &lt;= 2.1 , &quot;Evidence_strength&quot; :=  &quot;Indeterminate&quot; ]
+t_iter[  OddsPath &gt; 2.1 , &quot;Evidence_strength&quot; :=  &quot;PS3 supporting&quot; ]
+t_iter[  OddsPath &gt; 4.3 , &quot;Evidence_strength&quot; :=  &quot;PS3 moderate&quot; ]
+t_iter[  OddsPath &gt; 18.7 , &quot;Evidence_strength&quot; :=  &quot;PS3 strong&quot; ]
+t_iter[  OddsPath &gt; 350 , &quot;Evidence_strength&quot; :=  &quot;PS3 very strong&quot; ]
+t_iter$Evidence_strength &lt;- factor(t_iter$Evidence_strength, 
+                                   levels= c(&quot;Indeterminate&quot;, &quot;PS3 supporting&quot;,
+                                             &quot;PS3 moderate&quot;, &quot;PS3 strong&quot;, &quot;PS3 very strong&quot;))</code></pre>
+<pre class="r"><code>ggplot(t_iter[ Threshold &gt;= 0.1 &amp; Threshold &lt; 0.65], aes(Threshold, OddsPath))+
+  geom_vline(xintercept = 0.3, linetype = &quot;dashed&quot;, color = &quot;red&quot;)+
+  
+  geom_hline(yintercept = 2.1, linetype = &quot;dashed&quot;)+
+  geom_hline(yintercept = 4.3, linetype = &quot;dashed&quot;)+
+  geom_hline(yintercept = 18.7, linetype = &quot;dashed&quot;)+
+  # geom_hline(yintercept = 350, linetype = &quot;dashed&quot;)+
+  
+  geom_line(aes(colour = Variant_type),size = 1.1)+
+  geom_point(aes(fill = Variant_type, shape = Evidence_strength), size = 3, colour = &quot;grey20&quot;)+
+  xlab(&quot;|effect size| threshold of\nominaly significant aberrant splicing&quot;) + 
+  ylab(&quot;Odds of pathogenicity (OddsPath)&quot;) +
+  labs(fill = &quot;Variant type&quot;, 
+       colour = &quot;Variant type&quot;, 
+       shape = &quot;Evidence strength\nequivalent&quot;)+  
+  scale_color_brewer(palette = &quot;Pastel2&quot;)+
+  scale_fill_brewer(palette = &quot;Pastel2&quot;)+
+  #scale_fill_manual(values = variant_colors) +
+  scale_shape_manual(values = evidence_shape ) +
+  scale_x_continuous(breaks=c(0.1, 0.2, 0.3, 0.4, 0.5, 0.6), label=c(&quot;&gt;0.1&quot;, &quot;&gt;0.2&quot;, &quot;&gt;0.3&quot;, &quot;&gt;0.4&quot;, &quot;&gt;0.5&quot;, &quot;&gt;0.6&quot;))+
+  guides(fill=FALSE)+
+  
+  theme_classic()+
+  theme(axis.title.y= element_text( size=12,  face=&quot;bold&quot;),
+        axis.title.x= element_text( size=12,  face=&quot;bold&quot;),
+        axis.text.x = element_text(face=&quot;bold&quot;,  size=12),
+        axis.text.y= element_text(face=&quot;bold&quot;,  size=12))</code></pre>
+<p><img src="Scripts_RNA_seq_Aberrant_splicing_files/figure-html/unnamed-chunk-13-1.png" width="960" /></p>
+</div>
+</div>
+
+<div id="rmd-source-code">IyctLS0KIycgdGl0bGU6IE9kZHNQYXRoIGFiZXJyYW50IHNwbGljaW5nCiMnIGF1dGhvcjogRG1pdHJpaSBTbWlybm92CiMnIHdiOgojJyAgaW5wdXQ6CiMnICAtIGNvbmZpZzogJ3NyYy9jb25maWcuUicKIycgIC0gc2E6ICdgc20gY29uZmlnWyJSTkFfQU5OT1RBVElPTiJdYCcKIycgIG91dHB1dDoKIycgb3V0cHV0OiAKIycgICBodG1sX2RvY3VtZW50OgojJyAgICBjb2RlX2ZvbGRpbmc6IGhpZGUKIycgICAgY29kZV9kb3dubG9hZDogVFJVRQojJy0tLQoKCnNvdXJjZShzbmFrZW1ha2VAaW5wdXQkY29uZmlnKQojIHNvdXJjZSgnc3JjL2NvbmZpZy5SJykKCnZ0X1BCQyA8LSBmcmVhZCgiZGF0YS9wYXRob2dlbmljX2Jlbmlnbl92YXJpYW50cy50c3YiKQoKCiMgUmVhZCBGcmFzZXIgCgojIGZyYXNlcl9nZW5lIDwtIHJlYWRSRFMoJy9zL3Byb2plY3QvcHJva2lzY2gvcHJvY2Vzc2VkX2RhdGEvYWJlcnJhbnRfc3BsaWNpbmcvcmVzdWx0cy9maWItLXYyOV9yZXN1bHRzX2FsbF9ieV9nZW5lLlJkcycpICU+JSBhcy5kYXRhLnRhYmxlKCkKZmcgPC0gcmVhZFJEUygiLi4vVmFyaWFudF9pbnRlcnByZXRhdGlvbl9STkEvRlJBU0VSX2dlbmVfcmVzdWx0c19hbGwuUmRzIikgJT4lIGFzLmRhdGEudGFibGUoKQpmZyA8LSBmZ1ssIGMoInNhbXBsZUlEIiwgImhnbmNTeW1ib2wiLCAidHlwZSIsICJwVmFsdWUiLCAicGFkanVzdCIsICAicHNpVmFsdWUiLCAgImRlbHRhUHNpIiwgImFiZXJyYW50IiAgKV0Kc2V0bmFtZXMoZmcsIGMoICJzYW1wbGVJRCIsICJoZ25jU3ltYm9sIiwgInBWYWx1ZSIsICJwYWRqdXN0IiwgImFiZXJyYW50IiApLCAKICAgICAgICAgYyggIlJOQV9JRCIsImdlbmVJRCIsICJBU19QVkFMVUUiLCAiQVNfUEFESiIgLCAiQVMiICkpCgpmZ1ssZ2VuZUlEIDo9IHRvdXBwZXIoZ2VuZUlEKSBdCmZnWyAsIHNhbXBsZV9nZW5lIDo9IHBhc3RlMChSTkFfSUQsICJfIiwgZ2VuZUlEKV0KZmdbLCBBUzo9IEFTX1BBREogPCAwLjA1XQpmZ1sgLCBTaWduaWZpY2FuY2UgOj0gIm4ucy4iXQpmZ1sgQVNfUFZBTFVFIDwgMC4wNSwgU2lnbmlmaWNhbmNlIDo9ICJwLXZhbHVlIDwgMC4wNSJdCgoKCgpmZyA8LSBmZ1tSTkFfSUQgJWluJSB2dF9QQkMkUk5BX0lEIF0KZmcgPC0gZmdbZ2VuZUlEICVpbiUgdW5pcXVlKHZ0X1BCQyRnZW5lSUQpIF0KCgp2dF9QQkMgPC0gdnRfUEJDW1JOQV9JRCAlaW4lIHVuaXF1ZShmZyRSTkFfSUQpXQp2dF9QQkMgPC0gdnRfUEJDWyFpcy5uYSh2YXJfdHlwZSldCgojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKCiMjIENvbWJpbmUgdmFyaWFudHMgYW5kIGV4cHJlc3Npb24KdnRvIDwtIG1lcmdlKHZ0X1BCQywgZmcsIGJ5ID0gYygiUk5BX0lEIiwgImdlbmVJRCIpKQoKIycgIyBQYXRob2dlbmljIGZ1bmN0aW9uYWwgZXZpZGVuY2UgCgoKCiMrIGZpZy53aWR0aD0xMCwgZmlnLmhlaWdodD03CmdncGxvdCh2dG8sIGFlcyh2YXJfdHlwZSwgZGVsdGFQc2kpICkrCiAgZ2VvbV9xdWFzaXJhbmRvbShhZXMoZmlsbCA9IFBhdGhvZ2VuaWNpdHksIHNoYXBlID0gZ2Vub3R5cGUsIHNpemUgPSBTaWduaWZpY2FuY2UpLCBjb2xvciA9ICJncmV5MjAiKSsKICBzY2FsZV9zaGFwZV9tYW51YWwodmFsdWVzID0gZ2VuZV9zaGFwZXMsIGd1aWRlID0gZ3VpZGVfbGVnZW5kKG92ZXJyaWRlLmFlcyA9IGxpc3QoZmlsbCA9ICJibGFjayIsIHNpemUgPSAzLCBvcmRlciA9IDEpKSApICsKICBzY2FsZV9maWxsX21hbnVhbCh2YWx1ZXMgPSBvdXRsaWVyX2NvbG9ycywgZ3VpZGUgPSBndWlkZV9sZWdlbmQob3ZlcnJpZGUuYWVzID0gbGlzdChzaGFwZSA9IDIzLCBzaXplID0gMywgb3JkZXIgPSAyKSkpICsKICBzY2FsZV9zaXplX21hbnVhbCh2YWx1ZXMgPSBnZW5lX3NpemUpICsKICB4bGFiKCIiKSArIAogIHlsYWIoIkFiZXJyYW50IHNwbGljaW5nXG5lZmZlY3Qgc2l6ZSIpICsKICBsYWJzKGZpbGwgPSAiUGF0aG9nZW5pY2l0eSIsIAogICAgICAgc2l6ZSA9ICJTaWduaWZpY2FuY2UiLAogICAgICAgc2hhcGUgPSAiR2Vub3R5cGUiKSsgIAogIGdlb21faGxpbmUoeWludGVyY2VwdCA9IDApKwogIGdlb21faGxpbmUoeWludGVyY2VwdCA9IDAuMywgbGluZXR5cGUgPSAiZGFzaGVkIikrCiAgZ2VvbV9obGluZSh5aW50ZXJjZXB0ID0gLTAuMywgbGluZXR5cGUgPSAiZGFzaGVkIikrCiAgdGhlbWVfY2xhc3NpYygpKwogIHRoZW1lKGF4aXMudGl0bGUueT0gZWxlbWVudF90ZXh0KCBzaXplPTEyLCAgZmFjZT0iYm9sZCIpLAogICAgICAgIGF4aXMudGl0bGUueD0gZWxlbWVudF90ZXh0KCBzaXplPTEyLCAgZmFjZT0iYm9sZCIpLAogICAgICAgIGF4aXMudGV4dC54ID0gZWxlbWVudF90ZXh0KGZhY2U9ImJvbGQiLCAgc2l6ZT0xMiksCiAgICAgICAgYXhpcy50ZXh0Lnk9IGVsZW1lbnRfdGV4dChmYWNlPSJib2xkIiwgIHNpemU9MTIpKQoKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwojIyMjIE1haW4gZmlndXJlcyAjIyMjIyMjIyMKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwoKCiMjIyMjIwojIGVmZmVjdCBzaXplICsgcC12YWx1ZQp2dG9bLCBBYnNfZWZmZWN0X3NpemUgOj0gYWJzKGRlbHRhUHNpKSBdCnRocmVzaG9sZHMgPC0gc2VxKDAsIDAuNjUsIDAuMDUpCgp0X2l0ZXIgPC0gZGF0YS5mcmFtZSgpCmZvciAodCBpbiB0aHJlc2hvbGRzKXsKICAjIyMgQWxsCiAgUDEgPC0gbnJvdyh2dG9bUGF0aG9nZW5pY2l0eSA9PSAiUGF0aG9nZW5pYyIgXSkgLyBucm93KHZ0bykKICBQMiA8LSBucm93KHZ0b1tQYXRob2dlbmljaXR5ID09ICJQYXRob2dlbmljIiAmIEFTX1BWQUxVRSA8IDAuMDUgJiBBYnNfZWZmZWN0X3NpemUgPiB0XSkgLyAKICAgIChucm93KHZ0b1tBU19QVkFMVUUgPCAwLjA1ICYgIEFic19lZmZlY3Rfc2l6ZSA+IHRdKSArMSApCiAgCiAgZGYgPC0gZGF0YS5mcmFtZSgiVHlwZSIgPSAiRkMiLAogICAgICAgICAgICAgICAgICAgIlZhcmlhbnRfdHlwZSIgPSAiQWxsIiwKICAgICAgICAgICAgICAgICAgICJUaHJlc2hvbGQiID0gdCwKICAgICAgICAgICAgICAgICAgICJPZGRzUGF0aCIgPSAoUDIgKiAoMSAtIFAxKSApIC8gKCgxIC0gUDIpICogUDEgKSApCiAgCiAgdF9pdGVyIDwtIHJiaW5kKHRfaXRlciwgZGYpCiAgCiAgIyMjIFBUVgogIFAxIDwtIG5yb3codnRvW1BhdGhvZ2VuaWNpdHkgPT0gIlBhdGhvZ2VuaWMiIF0pIC8gbnJvdyh2dG8pCiAgUDIgPC0gbnJvdyh2dG9bUGF0aG9nZW5pY2l0eSA9PSAiUGF0aG9nZW5pYyIgJiAgdmFyX3R5cGUgPT0gIlBUViIgJiBBU19QVkFMVUUgPCAwLjA1ICYgIEFic19lZmZlY3Rfc2l6ZSA+IHRdKSAvIAogICAgKG5yb3codnRvW3Zhcl90eXBlID09ICJQVFYiICYgQVNfUFZBTFVFIDwgMC4wNSAmIEFic19lZmZlY3Rfc2l6ZSA+IHRdKSArMSApCiAgCiAgZGYgPC0gZGF0YS5mcmFtZSgiVHlwZSIgPSAiRkMiLAogICAgICAgICAgICAgICAgICAgIlZhcmlhbnRfdHlwZSIgPSAiUFRWIiwKICAgICAgICAgICAgICAgICAgICJUaHJlc2hvbGQiID0gdCwKICAgICAgICAgICAgICAgICAgICJPZGRzUGF0aCIgPSAoUDIgKiAoMSAtIFAxKSApIC8gKCgxIC0gUDIpICogUDEgKSApCiAgCiAgdF9pdGVyIDwtIHJiaW5kKHRfaXRlciwgZGYpCiAgCiAgIyMjIENvZGluZwogIFAxIDwtIG5yb3codnRvW1BhdGhvZ2VuaWNpdHkgPT0gIlBhdGhvZ2VuaWMiIF0pIC8gbnJvdyh2dG8pCiAgUDIgPC0gbnJvdyh2dG9bUGF0aG9nZW5pY2l0eSA9PSAiUGF0aG9nZW5pYyIgJiAgdmFyX3R5cGUgPT0gIkNvZGluZyIgJiBBU19QVkFMVUUgPCAwLjA1ICYgIEFic19lZmZlY3Rfc2l6ZSA+IHRdKSAvIAogICAgKG5yb3codnRvW3Zhcl90eXBlID09ICJDb2RpbmciICYgQVNfUFZBTFVFIDwgMC4wNSAmIEFic19lZmZlY3Rfc2l6ZSA+IHRdKSArMSApCiAgCiAgZGYgPC0gZGF0YS5mcmFtZSgiVHlwZSIgPSAiRkMiLAogICAgICAgICAgICAgICAgICAgIlZhcmlhbnRfdHlwZSIgPSAiQ29kaW5nIiwKICAgICAgICAgICAgICAgICAgICJUaHJlc2hvbGQiID0gdCwKICAgICAgICAgICAgICAgICAgICJPZGRzUGF0aCIgPSAoUDIgKiAoMSAtIFAxKSApIC8gKCgxIC0gUDIpICogUDEgKSApCiAgCiAgdF9pdGVyIDwtIHJiaW5kKHRfaXRlciwgZGYpCiAgCiAgIyMjIE5vbi1jb2RpbmcKICBQMSA8LSBucm93KHZ0b1tQYXRob2dlbmljaXR5ID09ICJQYXRob2dlbmljIiBdKSAvIG5yb3codnRvKQogIFAyIDwtIG5yb3codnRvW1BhdGhvZ2VuaWNpdHkgPT0gIlBhdGhvZ2VuaWMiICYgIHZhcl90eXBlID09ICJOb24tY29kaW5nIiAmIEFTX1BWQUxVRSA8IDAuMDUgJiAgQWJzX2VmZmVjdF9zaXplID4gdF0pIC8gCiAgICAobnJvdyh2dG9bdmFyX3R5cGUgPT0gIk5vbi1jb2RpbmciICYgQVNfUFZBTFVFIDwgMC4wNSAmIEFic19lZmZlY3Rfc2l6ZSA+IHRdKSArMSApCiAgCiAgZGYgPC0gZGF0YS5mcmFtZSgiVHlwZSIgPSAiRkMiLAogICAgICAgICAgICAgICAgICAgIlZhcmlhbnRfdHlwZSIgPSAiTm9uLWNvZGluZyIsCiAgICAgICAgICAgICAgICAgICAiVGhyZXNob2xkIiA9IHQsCiAgICAgICAgICAgICAgICAgICAiT2Rkc1BhdGgiID0gKFAyICogKDEgLSBQMSkgKSAvICgoMSAtIFAyKSAqIFAxICkgKQogIAogIHRfaXRlciA8LSByYmluZCh0X2l0ZXIsIGRmKQogIAogICMjIyBTcGxpY2UKICBQMSA8LSBucm93KHZ0b1tQYXRob2dlbmljaXR5ID09ICJQYXRob2dlbmljIiBdKSAvIG5yb3codnRvKQogIFAyIDwtIG5yb3codnRvW1BhdGhvZ2VuaWNpdHkgPT0gIlBhdGhvZ2VuaWMiICYgIHZhcl90eXBlID09ICJTcGxpY2UiICYgIEFTX1BWQUxVRSA8IDAuMDUgJiBBYnNfZWZmZWN0X3NpemUgPiB0XSkgLyAKICAgIChucm93KHZ0b1t2YXJfdHlwZSA9PSAiU3BsaWNlIiAmIEFTX1BWQUxVRSA8IDAuMDUgJiBBYnNfZWZmZWN0X3NpemUgPiB0XSkgKzEgKQogIAogIGRmIDwtIGRhdGEuZnJhbWUoIlR5cGUiID0gIkZDIiwKICAgICAgICAgICAgICAgICAgICJWYXJpYW50X3R5cGUiID0gIlNwbGljZSIsCiAgICAgICAgICAgICAgICAgICAiVGhyZXNob2xkIiA9IHQsCiAgICAgICAgICAgICAgICAgICAiT2Rkc1BhdGgiID0gKFAyICogKDEgLSBQMSkgKSAvICgoMSAtIFAyKSAqIFAxICkgKQogIAogIHRfaXRlciA8LSByYmluZCh0X2l0ZXIsIGRmKQp9CnRfaXRlciA8LSBhcy5kYXRhLnRhYmxlKHRfaXRlcikKdF9pdGVyWyAgT2Rkc1BhdGggPD0gMi4xICwgIkV2aWRlbmNlX3N0cmVuZ3RoIiA6PSAgIkluZGV0ZXJtaW5hdGUiIF0KdF9pdGVyWyAgT2Rkc1BhdGggPiAyLjEgLCAiRXZpZGVuY2Vfc3RyZW5ndGgiIDo9ICAiUFMzIHN1cHBvcnRpbmciIF0KdF9pdGVyWyAgT2Rkc1BhdGggPiA0LjMgLCAiRXZpZGVuY2Vfc3RyZW5ndGgiIDo9ICAiUFMzIG1vZGVyYXRlIiBdCnRfaXRlclsgIE9kZHNQYXRoID4gMTguNyAsICJFdmlkZW5jZV9zdHJlbmd0aCIgOj0gICJQUzMgc3Ryb25nIiBdCnRfaXRlclsgIE9kZHNQYXRoID4gMzUwICwgIkV2aWRlbmNlX3N0cmVuZ3RoIiA6PSAgIlBTMyB2ZXJ5IHN0cm9uZyIgXQp0X2l0ZXIkRXZpZGVuY2Vfc3RyZW5ndGggPC0gZmFjdG9yKHRfaXRlciRFdmlkZW5jZV9zdHJlbmd0aCwgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgbGV2ZWxzPSBjKCJJbmRldGVybWluYXRlIiwgIlBTMyBzdXBwb3J0aW5nIiwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIlBTMyBtb2RlcmF0ZSIsICJQUzMgc3Ryb25nIiwgIlBTMyB2ZXJ5IHN0cm9uZyIpKQoKcDEgPC0gZ2dwbG90KHZ0bywgYWVzKHZhcl90eXBlLCBBYnNfZWZmZWN0X3NpemUpICkrCiAgZ2VvbV9xdWFzaXJhbmRvbShhZXMoZmlsbCA9IFBhdGhvZ2VuaWNpdHksIHNoYXBlID0gZ2Vub3R5cGUsIHNpemUgPSBTaWduaWZpY2FuY2UpLCBjb2xvciA9ICJncmV5MjAiKSsKICBzY2FsZV9zaGFwZV9tYW51YWwodmFsdWVzID0gZ2VuZV9zaGFwZXMsIGd1aWRlID0gZ3VpZGVfbGVnZW5kKG92ZXJyaWRlLmFlcyA9IGxpc3QoZmlsbCA9ICJibGFjayIsIHNpemUgPSAzLCBvcmRlciA9IDEpKSApICsKICBzY2FsZV9maWxsX21hbnVhbCh2YWx1ZXMgPSBvdXRsaWVyX2NvbG9ycywgZ3VpZGUgPSBndWlkZV9sZWdlbmQob3ZlcnJpZGUuYWVzID0gbGlzdChzaGFwZSA9IDIzLCBzaXplID0gMywgb3JkZXIgPSAyKSkpICsKICBzY2FsZV9zaXplX21hbnVhbCh2YWx1ZXMgPSBnZW5lX3NpemUpICsKICB4bGFiKCIiKSArIAogIHlsYWIoIkFiZXJyYW50IHNwbGljaW5nXG58ZWZmZWN0IHNpemV8IikgKwogIGxhYnMoZmlsbCA9ICJQYXRob2dlbmljaXR5IiwgCiAgICAgICBzaXplID0gIlNpZ25pZmljYW5jZSIsCiAgICAgICBzaGFwZSA9ICJHZW5vdHlwZSIpKyAgCiAgI2dlb21faGxpbmUoeWludGVyY2VwdCA9IDApKwogIGdlb21faGxpbmUoeWludGVyY2VwdCA9IDAuMywgbGluZXR5cGUgPSAiZGFzaGVkIiwgY29sb3IgPSAicmVkIikrCiAgc2NhbGVfeV9jb250aW51b3VzKGJyZWFrcz1jKDAsIDAuMSwgMC4yLCAwLjMsIDAuNCwgMC41LCAwLjYsIDAuNykpKwogIHRoZW1lX2NsYXNzaWMoKSsKICB0aGVtZShheGlzLnRpdGxlLnk9IGVsZW1lbnRfdGV4dCggc2l6ZT0xMiwgIGZhY2U9ImJvbGQiKSwKICAgICAgICBheGlzLnRpdGxlLng9IGVsZW1lbnRfdGV4dCggc2l6ZT0xMiwgIGZhY2U9ImJvbGQiKSwKICAgICAgICBheGlzLnRleHQueCA9IGVsZW1lbnRfdGV4dChmYWNlPSJib2xkIiwgIHNpemU9MTIpLAogICAgICAgIGF4aXMudGV4dC55PSBlbGVtZW50X3RleHQoZmFjZT0iYm9sZCIsICBzaXplPTEyKSkKCgpwMiA8LSBnZ3Bsb3QodF9pdGVyWyBUaHJlc2hvbGQgPj0gMC4xICYgVGhyZXNob2xkIDwgMC42NV0sIGFlcyhUaHJlc2hvbGQsIE9kZHNQYXRoKSkrCiAgZ2VvbV92bGluZSh4aW50ZXJjZXB0ID0gMC4zLCBsaW5ldHlwZSA9ICJkYXNoZWQiLCBjb2xvciA9ICJyZWQiKSsKICAKICBnZW9tX2hsaW5lKHlpbnRlcmNlcHQgPSAyLjEsIGxpbmV0eXBlID0gImRhc2hlZCIpKwogIGdlb21faGxpbmUoeWludGVyY2VwdCA9IDQuMywgbGluZXR5cGUgPSAiZGFzaGVkIikrCiAgZ2VvbV9obGluZSh5aW50ZXJjZXB0ID0gMTguNywgbGluZXR5cGUgPSAiZGFzaGVkIikrCiAgIyBnZW9tX2hsaW5lKHlpbnRlcmNlcHQgPSAzNTAsIGxpbmV0eXBlID0gImRhc2hlZCIpKwogIAogIGdlb21fbGluZShhZXMoY29sb3VyID0gVmFyaWFudF90eXBlKSxzaXplID0gMS4xKSsKICBnZW9tX3BvaW50KGFlcyhmaWxsID0gVmFyaWFudF90eXBlLCBzaGFwZSA9IEV2aWRlbmNlX3N0cmVuZ3RoKSwgc2l6ZSA9IDMsIGNvbG91ciA9ICJncmV5MjAiKSsKICB4bGFiKCJ8ZWZmZWN0IHNpemV8IHRocmVzaG9sZCBvZlxub21pbmFseSBzaWduaWZpY2FudCBhYmVycmFudCBzcGxpY2luZyIpICsgCiAgeWxhYigiT2RkcyBvZiBwYXRob2dlbmljaXR5IChPZGRzUGF0aCkiKSArCiAgbGFicyhmaWxsID0gIlZhcmlhbnQgdHlwZSIsIAogICAgICAgY29sb3VyID0gIlZhcmlhbnQgdHlwZSIsIAogICAgICAgc2hhcGUgPSAiRXZpZGVuY2Ugc3RyZW5ndGhcbmVxdWl2YWxlbnQiKSsgIAogIHNjYWxlX2NvbG9yX2JyZXdlcihwYWxldHRlID0gIlBhc3RlbDIiKSsKICBzY2FsZV9maWxsX2JyZXdlcihwYWxldHRlID0gIlBhc3RlbDIiKSsKICAjc2NhbGVfZmlsbF9tYW51YWwodmFsdWVzID0gdmFyaWFudF9jb2xvcnMpICsKICBzY2FsZV9zaGFwZV9tYW51YWwodmFsdWVzID0gZXZpZGVuY2Vfc2hhcGUgKSArCiAgc2NhbGVfeF9jb250aW51b3VzKGJyZWFrcz1jKDAuMSwgMC4yLCAwLjMsIDAuNCwgMC41LCAwLjYpLCBsYWJlbD1jKCI+MC4xIiwgIj4wLjIiLCAiPjAuMyIsICI+MC40IiwgIj4wLjUiLCAiPjAuNiIpKSsKICBndWlkZXMoZmlsbD1GQUxTRSkrCiAgCiAgdGhlbWVfY2xhc3NpYygpKwogIHRoZW1lKGF4aXMudGl0bGUueT0gZWxlbWVudF90ZXh0KCBzaXplPTEyLCAgZmFjZT0iYm9sZCIpLAogICAgICAgIGF4aXMudGl0bGUueD0gZWxlbWVudF90ZXh0KCBzaXplPTEyLCAgZmFjZT0iYm9sZCIpLAogICAgICAgIGF4aXMudGV4dC54ID0gZWxlbWVudF90ZXh0KGZhY2U9ImJvbGQiLCAgc2l6ZT0xMiksCiAgICAgICAgYXhpcy50ZXh0Lnk9IGVsZW1lbnRfdGV4dChmYWNlPSJib2xkIiwgIHNpemU9MTIpKQoKcDYgPC0gcDEgKyBwMiArIHBsb3RfYW5ub3RhdGlvbih0YWdfbGV2ZWxzID0gJ2EnKSAmIAogIHRoZW1lKHBsb3QudGFnID0gZWxlbWVudF90ZXh0KCBzaXplPTE0LCAgZmFjZT0iYm9sZCIpKQoKIysgZmlnLndpZHRoPTEwLCBmaWcuaGVpZ2h0PTcKcDYKCgoKIyMjIyMjCiMgZWZmZWN0IHNpemUgKyBGRFIKdnRvWywgQWJzX2VmZmVjdF9zaXplIDo9IGFicyhkZWx0YVBzaSkgXQp0aHJlc2hvbGRzIDwtIHNlcSgwLCAwLjY1LCAwLjA1KQoKdF9pdGVyIDwtIGRhdGEuZnJhbWUoKQpmb3IgKHQgaW4gdGhyZXNob2xkcyl7CiAgIyMjIEFsbAogIFAxIDwtIG5yb3codnRvW1BhdGhvZ2VuaWNpdHkgPT0gIlBhdGhvZ2VuaWMiIF0pIC8gbnJvdyh2dG8pCiAgUDIgPC0gbnJvdyh2dG9bUGF0aG9nZW5pY2l0eSA9PSAiUGF0aG9nZW5pYyIgJiBBU19QQURKIDwgMC4xICYgQWJzX2VmZmVjdF9zaXplID4gdF0pIC8gCiAgICAobnJvdyh2dG9bQVNfUEFESiA8IDAuMSAmICBBYnNfZWZmZWN0X3NpemUgPiB0XSkgKzEgKQogIAogIGRmIDwtIGRhdGEuZnJhbWUoIlR5cGUiID0gIkZDIiwKICAgICAgICAgICAgICAgICAgICJWYXJpYW50X3R5cGUiID0gIkFsbCIsCiAgICAgICAgICAgICAgICAgICAiVGhyZXNob2xkIiA9IHQsCiAgICAgICAgICAgICAgICAgICAiT2Rkc1BhdGgiID0gKFAyICogKDEgLSBQMSkgKSAvICgoMSAtIFAyKSAqIFAxICkgKQogIAogIHRfaXRlciA8LSByYmluZCh0X2l0ZXIsIGRmKQogIAogICMjIyBQVFYKICBQMSA8LSBucm93KHZ0b1tQYXRob2dlbmljaXR5ID09ICJQYXRob2dlbmljIiBdKSAvIG5yb3codnRvKQogIFAyIDwtIG5yb3codnRvW1BhdGhvZ2VuaWNpdHkgPT0gIlBhdGhvZ2VuaWMiICYgIHZhcl90eXBlID09ICJQVFYiICYgQVNfUEFESiA8IDAuMSAmICBBYnNfZWZmZWN0X3NpemUgPiB0XSkgLyAKICAgIChucm93KHZ0b1t2YXJfdHlwZSA9PSAiUFRWIiAmIEFTX1BBREogPCAwLjEgJiBBYnNfZWZmZWN0X3NpemUgPiB0XSkgKzEgKQogIAogIGRmIDwtIGRhdGEuZnJhbWUoIlR5cGUiID0gIkZDIiwKICAgICAgICAgICAgICAgICAgICJWYXJpYW50X3R5cGUiID0gIlBUViIsCiAgICAgICAgICAgICAgICAgICAiVGhyZXNob2xkIiA9IHQsCiAgICAgICAgICAgICAgICAgICAiT2Rkc1BhdGgiID0gKFAyICogKDEgLSBQMSkgKSAvICgoMSAtIFAyKSAqIFAxICkgKQogIAogIHRfaXRlciA8LSByYmluZCh0X2l0ZXIsIGRmKQogIAogICMjIyBDb2RpbmcKICBQMSA8LSBucm93KHZ0b1tQYXRob2dlbmljaXR5ID09ICJQYXRob2dlbmljIiBdKSAvIG5yb3codnRvKQogIFAyIDwtIG5yb3codnRvW1BhdGhvZ2VuaWNpdHkgPT0gIlBhdGhvZ2VuaWMiICYgIHZhcl90eXBlID09ICJDb2RpbmciICYgQVNfUEFESiA8IDAuMSAmICBBYnNfZWZmZWN0X3NpemUgPiB0XSkgLyAKICAgIChucm93KHZ0b1t2YXJfdHlwZSA9PSAiQ29kaW5nIiAmIEFTX1BBREogPCAwLjEgJiBBYnNfZWZmZWN0X3NpemUgPiB0XSkgKzEgKQogIAogIGRmIDwtIGRhdGEuZnJhbWUoIlR5cGUiID0gIkZDIiwKICAgICAgICAgICAgICAgICAgICJWYXJpYW50X3R5cGUiID0gIkNvZGluZyIsCiAgICAgICAgICAgICAgICAgICAiVGhyZXNob2xkIiA9IHQsCiAgICAgICAgICAgICAgICAgICAiT2Rkc1BhdGgiID0gKFAyICogKDEgLSBQMSkgKSAvICgoMSAtIFAyKSAqIFAxICkgKQogIAogIHRfaXRlciA8LSByYmluZCh0X2l0ZXIsIGRmKQogIAogICMjIyBOb24tY29kaW5nCiAgUDEgPC0gbnJvdyh2dG9bUGF0aG9nZW5pY2l0eSA9PSAiUGF0aG9nZW5pYyIgXSkgLyBucm93KHZ0bykKICBQMiA8LSBucm93KHZ0b1tQYXRob2dlbmljaXR5ID09ICJQYXRob2dlbmljIiAmICB2YXJfdHlwZSA9PSAiTm9uLWNvZGluZyIgJiBBU19QQURKIDwgMC4xICYgIEFic19lZmZlY3Rfc2l6ZSA+IHRdKSAvIAogICAgKG5yb3codnRvW3Zhcl90eXBlID09ICJOb24tY29kaW5nIiAmIEFTX1BBREogPCAwLjEgJiBBYnNfZWZmZWN0X3NpemUgPiB0XSkgKzEgKQogIAogIGRmIDwtIGRhdGEuZnJhbWUoIlR5cGUiID0gIkZDIiwKICAgICAgICAgICAgICAgICAgICJWYXJpYW50X3R5cGUiID0gIk5vbi1jb2RpbmciLAogICAgICAgICAgICAgICAgICAgIlRocmVzaG9sZCIgPSB0LAogICAgICAgICAgICAgICAgICAgIk9kZHNQYXRoIiA9IChQMiAqICgxIC0gUDEpICkgLyAoKDEgLSBQMikgKiBQMSApICkKICAKICB0X2l0ZXIgPC0gcmJpbmQodF9pdGVyLCBkZikKICAKICAjIyMgU3BsaWNlCiAgUDEgPC0gbnJvdyh2dG9bUGF0aG9nZW5pY2l0eSA9PSAiUGF0aG9nZW5pYyIgXSkgLyBucm93KHZ0bykKICBQMiA8LSBucm93KHZ0b1tQYXRob2dlbmljaXR5ID09ICJQYXRob2dlbmljIiAmICB2YXJfdHlwZSA9PSAiU3BsaWNlIiAmICBBU19QQURKIDwgMC4xICYgQWJzX2VmZmVjdF9zaXplID4gdF0pIC8gCiAgICAobnJvdyh2dG9bdmFyX3R5cGUgPT0gIlNwbGljZSIgJiBBU19QQURKIDwgMC4xICYgQWJzX2VmZmVjdF9zaXplID4gdF0pICsxICkKICAKICBkZiA8LSBkYXRhLmZyYW1lKCJUeXBlIiA9ICJGQyIsCiAgICAgICAgICAgICAgICAgICAiVmFyaWFudF90eXBlIiA9ICJTcGxpY2UiLAogICAgICAgICAgICAgICAgICAgIlRocmVzaG9sZCIgPSB0LAogICAgICAgICAgICAgICAgICAgIk9kZHNQYXRoIiA9IChQMiAqICgxIC0gUDEpICkgLyAoKDEgLSBQMikgKiBQMSApICkKICAKICB0X2l0ZXIgPC0gcmJpbmQodF9pdGVyLCBkZikKfQp0X2l0ZXIgPC0gYXMuZGF0YS50YWJsZSh0X2l0ZXIpCnRfaXRlclsgIE9kZHNQYXRoIDw9IDIuMSAsICJFdmlkZW5jZV9zdHJlbmd0aCIgOj0gICJJbmRldGVybWluYXRlIiBdCnRfaXRlclsgIE9kZHNQYXRoID4gMi4xICwgIkV2aWRlbmNlX3N0cmVuZ3RoIiA6PSAgIlBTMyBzdXBwb3J0aW5nIiBdCnRfaXRlclsgIE9kZHNQYXRoID4gNC4zICwgIkV2aWRlbmNlX3N0cmVuZ3RoIiA6PSAgIlBTMyBtb2RlcmF0ZSIgXQp0X2l0ZXJbICBPZGRzUGF0aCA+IDE4LjcgLCAiRXZpZGVuY2Vfc3RyZW5ndGgiIDo9ICAiUFMzIHN0cm9uZyIgXQp0X2l0ZXJbICBPZGRzUGF0aCA+IDM1MCAsICJFdmlkZW5jZV9zdHJlbmd0aCIgOj0gICJQUzMgdmVyeSBzdHJvbmciIF0KdF9pdGVyJEV2aWRlbmNlX3N0cmVuZ3RoIDwtIGZhY3Rvcih0X2l0ZXIkRXZpZGVuY2Vfc3RyZW5ndGgsIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGxldmVscz0gYygiSW5kZXRlcm1pbmF0ZSIsICJQUzMgc3VwcG9ydGluZyIsCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICJQUzMgbW9kZXJhdGUiLCAiUFMzIHN0cm9uZyIsICJQUzMgdmVyeSBzdHJvbmciKSkKCnAxIDwtIGdncGxvdCh2dG8sIGFlcyh2YXJfdHlwZSwgQWJzX2VmZmVjdF9zaXplKSApKwogIGdlb21fcXVhc2lyYW5kb20oYWVzKGZpbGwgPSBQYXRob2dlbmljaXR5LCBzaGFwZSA9IGdlbm90eXBlLCBzaXplID0gU2lnbmlmaWNhbmNlKSwgY29sb3IgPSAiZ3JleTIwIikrCiAgc2NhbGVfc2hhcGVfbWFudWFsKHZhbHVlcyA9IGdlbmVfc2hhcGVzLCBndWlkZSA9IGd1aWRlX2xlZ2VuZChvdmVycmlkZS5hZXMgPSBsaXN0KGZpbGwgPSAiYmxhY2siLCBzaXplID0gMywgb3JkZXIgPSAxKSkgKSArCiAgc2NhbGVfZmlsbF9tYW51YWwodmFsdWVzID0gb3V0bGllcl9jb2xvcnMsIGd1aWRlID0gZ3VpZGVfbGVnZW5kKG92ZXJyaWRlLmFlcyA9IGxpc3Qoc2hhcGUgPSAyMywgc2l6ZSA9IDMsIG9yZGVyID0gMikpKSArCiAgc2NhbGVfc2l6ZV9tYW51YWwodmFsdWVzID0gZ2VuZV9zaXplKSArCiAgeGxhYigiIikgKyAKICB5bGFiKCJBYmVycmFudCBzcGxpY2luZ1xufGVmZmVjdCBzaXplfCIpICsKICBsYWJzKGZpbGwgPSAiUGF0aG9nZW5pY2l0eSIsIAogICAgICAgc2l6ZSA9ICJTaWduaWZpY2FuY2UiLAogICAgICAgc2hhcGUgPSAiR2Vub3R5cGUiKSsgIAogICNnZW9tX2hsaW5lKHlpbnRlcmNlcHQgPSAwKSsKICBnZW9tX2hsaW5lKHlpbnRlcmNlcHQgPSAwLjMsIGxpbmV0eXBlID0gImRhc2hlZCIpKwogIHRoZW1lX2NsYXNzaWMoKSsKICB0aGVtZShheGlzLnRpdGxlLnk9IGVsZW1lbnRfdGV4dCggc2l6ZT0xMiwgIGZhY2U9ImJvbGQiKSwKICAgICAgICBheGlzLnRpdGxlLng9IGVsZW1lbnRfdGV4dCggc2l6ZT0xMiwgIGZhY2U9ImJvbGQiKSwKICAgICAgICBheGlzLnRleHQueCA9IGVsZW1lbnRfdGV4dChmYWNlPSJib2xkIiwgIHNpemU9MTIpLAogICAgICAgIGF4aXMudGV4dC55PSBlbGVtZW50X3RleHQoZmFjZT0iYm9sZCIsICBzaXplPTEyKSkKCiMnICMjIE9kZHNQYXRoIGZvciB8ZWZmZWN0IHNpemV8IHRocmVzaG9sZHMgb2YgRkRSIHNpZ25pZmljYW50IChGRFIgPCAwLjEpIGFiZXJyYW50IHNwbGljaW5nCnAyIDwtIGdncGxvdCh0X2l0ZXJbIFRocmVzaG9sZCA+PSAwLjEgJiBUaHJlc2hvbGQgPCAwLjY1XSwgYWVzKFRocmVzaG9sZCwgT2Rkc1BhdGgpKSsKICBnZW9tX3ZsaW5lKHhpbnRlcmNlcHQgPSAwLjMsIGxpbmV0eXBlID0gImRhc2hlZCIpKwogIAogIGdlb21faGxpbmUoeWludGVyY2VwdCA9IDIuMSwgbGluZXR5cGUgPSAiZGFzaGVkIikrCiAgZ2VvbV9obGluZSh5aW50ZXJjZXB0ID0gNC4zLCBsaW5ldHlwZSA9ICJkYXNoZWQiKSsKICBnZW9tX2hsaW5lKHlpbnRlcmNlcHQgPSAxOC43LCBsaW5ldHlwZSA9ICJkYXNoZWQiKSsKICAjIGdlb21faGxpbmUoeWludGVyY2VwdCA9IDM1MCwgbGluZXR5cGUgPSAiZGFzaGVkIikrCiAgCiAgZ2VvbV9saW5lKGFlcyhjb2xvdXIgPSBWYXJpYW50X3R5cGUpLHNpemUgPSAxLjEpKwogIGdlb21fcG9pbnQoYWVzKGZpbGwgPSBWYXJpYW50X3R5cGUsIHNoYXBlID0gRXZpZGVuY2Vfc3RyZW5ndGgpLCBzaXplID0gMywgY29sb3VyID0gImdyZXkyMCIpKwogIHhsYWIoInxlZmZlY3Qgc2l6ZXwgdGhyZXNob2xkIG9mXG5GRFIgc2lnbmlmaWNhbnQgYWJlcnJhbnQgc3BsaWNpbmciKSArIAogIHlsYWIoIlxuT2RkcyBvZiBwYXRob2dlbmljaXR5IChPZGRzUGF0aCkiKSArCiAgbGFicyhmaWxsID0gIlZhcmlhbnQgdHlwZSIsIAogICAgICAgY29sb3VyID0gIlZhcmlhbnQgdHlwZSIsIAogICAgICAgc2hhcGUgPSAiRXZpZGVuY2Ugc3RyZW5ndGhcbmVxdWl2YWxlbnQiKSsgIAogIHNjYWxlX2NvbG9yX2JyZXdlcihwYWxldHRlID0gIlBhc3RlbDIiKSsKICBzY2FsZV9maWxsX2JyZXdlcihwYWxldHRlID0gIlBhc3RlbDIiKSsKICAjc2NhbGVfZmlsbF9tYW51YWwodmFsdWVzID0gdmFyaWFudF9jb2xvcnMpICsKICBzY2FsZV9zaGFwZV9tYW51YWwodmFsdWVzID0gZXZpZGVuY2Vfc2hhcGUgKSArCiAgc2NhbGVfeF9jb250aW51b3VzKGJyZWFrcz1jKDAuMSwgMC4yLCAwLjMsIDAuNCwgMC41LCAwLjYpLCBsYWJlbD1jKCI+MC4xIiwgIj4wLjIiLCAiPjAuMyIsICI+MC40IiwgIj4wLjUiLCAiPjAuNiIpKSsKICBndWlkZXMoZmlsbD1GQUxTRSkrCiAgCiAgdGhlbWVfY2xhc3NpYygpKwogIHRoZW1lKGF4aXMudGl0bGUueT0gZWxlbWVudF90ZXh0KCBzaXplPTEyLCAgZmFjZT0iYm9sZCIpLAogICAgICAgIGF4aXMudGl0bGUueD0gZWxlbWVudF90ZXh0KCBzaXplPTEyLCAgZmFjZT0iYm9sZCIpLAogICAgICAgIGF4aXMudGV4dC54ID0gZWxlbWVudF90ZXh0KGZhY2U9ImJvbGQiLCAgc2l6ZT0xMiksCiAgICAgICAgYXhpcy50ZXh0Lnk9IGVsZW1lbnRfdGV4dChmYWNlPSJib2xkIiwgIHNpemU9MTIpKQoKc3VwcF9hcyA8LSBwMSArIHAyICArIHBsb3RfYW5ub3RhdGlvbih0YWdfbGV2ZWxzID0gJ2EnKSAmIAogIHRoZW1lKHBsb3QudGFnID0gZWxlbWVudF90ZXh0KCBzaXplPTE0LCAgZmFjZT0iYm9sZCIpKQoKIysgZmlnLndpZHRoPTEwLCBmaWcuaGVpZ2h0PTcKc3VwcF9hcwoKCgoKCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwojIyMjIyBQLXZhbHVlCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjCgoKIycgIyMgT2Rkc1BhdGggZm9yIHAtdmFsdWUgdGhyZXNob2xkcwojIyMjIFAtdmFsdWUgaXRlcmF0aW9uCiMgdGhyZXNob2xkcyA8LSBzZXEoMCwgMC4wNSwgMC4wMDEpCnRocmVzaG9sZHMgPC0gYygwLCAxMF4tNiwgMTBeLTUsIDEwXi00LCAwLjAwMSwgMC4wMDUsIDAuMDUsIDAuMDEsIDAuMSkKdF9pdGVyIDwtIGRhdGEuZnJhbWUoKQpmb3IgKHQgaW4gdGhyZXNob2xkcyl7CiAgIyMjIEFsbAogIFAxIDwtIG5yb3codnRvW1BhdGhvZ2VuaWNpdHkgPT0gIlBhdGhvZ2VuaWMiIF0pIC8gbnJvdyh2dG8pCiAgUDIgPC0gbnJvdyh2dG9bUGF0aG9nZW5pY2l0eSA9PSAiUGF0aG9nZW5pYyIgJiAgQVNfUFZBTFVFIDwgdF0pIC8gCiAgICAobnJvdyh2dG9bIEFTX1BWQUxVRSA8IHRdKSArMSApCiAgCiAgZGYgPC0gZGF0YS5mcmFtZSgiVHlwZSIgPSAiUC12YWx1ZSIsCiAgICAgICAgICAgICAgICAgICAiVmFyaWFudF90eXBlIiA9ICJBbGwiLAogICAgICAgICAgICAgICAgICAgIlRocmVzaG9sZCIgPSB0LAogICAgICAgICAgICAgICAgICAgIk9kZHNQYXRoIiA9IChQMiAqICgxIC0gUDEpICkgLyAoKDEgLSBQMikgKiBQMSApICkKICAKICB0X2l0ZXIgPC0gcmJpbmQodF9pdGVyLCBkZikKICAKICAjIyMgUFRWCiAgUDEgPC0gbnJvdyh2dG9bUGF0aG9nZW5pY2l0eSA9PSAiUGF0aG9nZW5pYyIgXSkgLyBucm93KHZ0bykKICBQMiA8LSBucm93KHZ0b1tQYXRob2dlbmljaXR5ID09ICJQYXRob2dlbmljIiAmICB2YXJfdHlwZSA9PSAiUFRWIiAmICBBU19QVkFMVUUgPCB0XSkgLyAKICAgIChucm93KHZ0b1t2YXJfdHlwZSA9PSAiUFRWIiAmIEFTX1BWQUxVRSA8IHRdKSArMSApCiAgCiAgZGYgPC0gZGF0YS5mcmFtZSgiVHlwZSIgPSAiUC12YWx1ZSIsCiAgICAgICAgICAgICAgICAgICAiVmFyaWFudF90eXBlIiA9ICJQVFYiLAogICAgICAgICAgICAgICAgICAgIlRocmVzaG9sZCIgPSB0LAogICAgICAgICAgICAgICAgICAgIk9kZHNQYXRoIiA9IChQMiAqICgxIC0gUDEpICkgLyAoKDEgLSBQMikgKiBQMSApICkKICAKICB0X2l0ZXIgPC0gcmJpbmQodF9pdGVyLCBkZikKICAKICAjIyMgQ29kaW5nCiAgUDEgPC0gbnJvdyh2dG9bUGF0aG9nZW5pY2l0eSA9PSAiUGF0aG9nZW5pYyIgXSkgLyBucm93KHZ0bykKICBQMiA8LSBucm93KHZ0b1tQYXRob2dlbmljaXR5ID09ICJQYXRob2dlbmljIiAmICB2YXJfdHlwZSA9PSAiQ29kaW5nIiAmIEFTX1BWQUxVRSA8IHRdKSAvIAogICAgKG5yb3codnRvW3Zhcl90eXBlID09ICJDb2RpbmciICYgQVNfUFZBTFVFIDwgdF0pICsxICkKICAKICBkZiA8LSBkYXRhLmZyYW1lKCJUeXBlIiA9ICJQLXZhbHVlIiwKICAgICAgICAgICAgICAgICAgICJWYXJpYW50X3R5cGUiID0gIkNvZGluZyIsCiAgICAgICAgICAgICAgICAgICAiVGhyZXNob2xkIiA9IHQsCiAgICAgICAgICAgICAgICAgICAiT2Rkc1BhdGgiID0gKFAyICogKDEgLSBQMSkgKSAvICgoMSAtIFAyKSAqIFAxICkgKQogIAogIHRfaXRlciA8LSByYmluZCh0X2l0ZXIsIGRmKQogIAogICMjIyBOb24tY29kaW5nCiAgUDEgPC0gbnJvdyh2dG9bUGF0aG9nZW5pY2l0eSA9PSAiUGF0aG9nZW5pYyIgXSkgLyBucm93KHZ0bykKICBQMiA8LSBucm93KHZ0b1tQYXRob2dlbmljaXR5ID09ICJQYXRob2dlbmljIiAmICB2YXJfdHlwZSA9PSAiTm9uLWNvZGluZyIgJiAgQVNfUFZBTFVFIDwgdF0pIC8gCiAgICAobnJvdyh2dG9bdmFyX3R5cGUgPT0gIk5vbi1jb2RpbmciICYgQVNfUFZBTFVFIDwgdF0pICsxICkKICAKICBkZiA8LSBkYXRhLmZyYW1lKCJUeXBlIiA9ICJQLXZhbHVlIiwKICAgICAgICAgICAgICAgICAgICJWYXJpYW50X3R5cGUiID0gIk5vbi1jb2RpbmciLAogICAgICAgICAgICAgICAgICAgIlRocmVzaG9sZCIgPSB0LAogICAgICAgICAgICAgICAgICAgIk9kZHNQYXRoIiA9IChQMiAqICgxIC0gUDEpICkgLyAoKDEgLSBQMikgKiBQMSApICkKICAKICB0X2l0ZXIgPC0gcmJpbmQodF9pdGVyLCBkZikKICAKICAjIyMgU3BsaWNlCiAgUDEgPC0gbnJvdyh2dG9bUGF0aG9nZW5pY2l0eSA9PSAiUGF0aG9nZW5pYyIgXSkgLyBucm93KHZ0bykKICBQMiA8LSBucm93KHZ0b1tQYXRob2dlbmljaXR5ID09ICJQYXRob2dlbmljIiAmICB2YXJfdHlwZSA9PSAiU3BsaWNlIiAmICBBU19QVkFMVUUgPCB0XSkgLyAKICAgIChucm93KHZ0b1t2YXJfdHlwZSA9PSAiU3BsaWNlIiAmIEFTX1BWQUxVRSA8IHRdKSArMSApCiAgCiAgZGYgPC0gZGF0YS5mcmFtZSgiVHlwZSIgPSAiUC12YWx1ZSIsCiAgICAgICAgICAgICAgICAgICAiVmFyaWFudF90eXBlIiA9ICJTcGxpY2UiLAogICAgICAgICAgICAgICAgICAgIlRocmVzaG9sZCIgPSB0LAogICAgICAgICAgICAgICAgICAgIk9kZHNQYXRoIiA9IChQMiAqICgxIC0gUDEpICkgLyAoKDEgLSBQMikgKiBQMSApICkKICAKICB0X2l0ZXIgPC0gcmJpbmQodF9pdGVyLCBkZikKfQp0X2l0ZXIgPC0gYXMuZGF0YS50YWJsZSh0X2l0ZXIpCnRfaXRlclsgIE9kZHNQYXRoIDw9IDIuMSAsICJFdmlkZW5jZV9zdHJlbmd0aCIgOj0gICJJbmRldGVybWluYXRlIiBdCnRfaXRlclsgIE9kZHNQYXRoID4gMi4xICwgIkV2aWRlbmNlX3N0cmVuZ3RoIiA6PSAgIlBTMyBzdXBwb3J0aW5nIiBdCnRfaXRlclsgIE9kZHNQYXRoID4gNC4zICwgIkV2aWRlbmNlX3N0cmVuZ3RoIiA6PSAgIlBTMyBtb2RlcmF0ZSIgXQp0X2l0ZXJbICBPZGRzUGF0aCA+IDE4LjcgLCAiRXZpZGVuY2Vfc3RyZW5ndGgiIDo9ICAiUFMzIHN0cm9uZyIgXQp0X2l0ZXJbICBPZGRzUGF0aCA+IDM1MCAsICJFdmlkZW5jZV9zdHJlbmd0aCIgOj0gICJQUzMgdmVyeSBzdHJvbmciIF0KdF9pdGVyJEV2aWRlbmNlX3N0cmVuZ3RoIDwtIGZhY3Rvcih0X2l0ZXIkRXZpZGVuY2Vfc3RyZW5ndGgsIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGxldmVscz0gYygiSW5kZXRlcm1pbmF0ZSIsICJQUzMgc3VwcG9ydGluZyIsCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICJQUzMgbW9kZXJhdGUiLCAiUFMzIHN0cm9uZyIsICJQUzMgdmVyeSBzdHJvbmciKSkKCiMrIGZpZy53aWR0aD0xMCwgZmlnLmhlaWdodD03CmdncGxvdCh0X2l0ZXJbVGhyZXNob2xkID4gMF0sIGFlcyhUaHJlc2hvbGQsIE9kZHNQYXRoKSkrCiAgI2dlb21fdmxpbmUoeGludGVyY2VwdCA9IDApKwogIGdlb21fdmxpbmUoeGludGVyY2VwdCA9IDAuMDEsIGxpbmV0eXBlID0gImRhc2hlZCIpKwogIGdlb21fdmxpbmUoeGludGVyY2VwdCA9IDAuMDUsIGxpbmV0eXBlID0gImRhc2hlZCIpKwogIAogIGdlb21faGxpbmUoeWludGVyY2VwdCA9IDIuMSwgbGluZXR5cGUgPSAiZGFzaGVkIikrCiAgZ2VvbV9obGluZSh5aW50ZXJjZXB0ID0gNC4zLCBsaW5ldHlwZSA9ICJkYXNoZWQiKSsKICBnZW9tX2hsaW5lKHlpbnRlcmNlcHQgPSAxOC43LCBsaW5ldHlwZSA9ICJkYXNoZWQiKSsKICAjIGdlb21faGxpbmUoeWludGVyY2VwdCA9IDM1MCwgbGluZXR5cGUgPSAiZGFzaGVkIikrCiAgCiAgZ2VvbV9saW5lKGFlcyhjb2xvdXIgPSBWYXJpYW50X3R5cGUpLCBzaXplID0gMS4xKSsKICBnZW9tX3BvaW50KGFlcyhmaWxsID0gVmFyaWFudF90eXBlLCBzaGFwZSA9IEV2aWRlbmNlX3N0cmVuZ3RoKSwgc2l6ZSA9IDMsIGNvbG91ciA9ICJncmV5MjAiKSsKICB4bGFiKCJwLXZhbHVlIHRocmVzaG9sZCIpICsgCiAgeWxhYigiT2RkcyBvZiBwYXRob2dlbmljaXR5IChPZGRzUGF0aCkiKSArCiAgbGFicyhmaWxsID0gIlZhcmlhbnQgdHlwZSIsIAogICAgICAgY29sb3VyID0gIlZhcmlhbnQgdHlwZSIsIAogICAgICAgc2hhcGUgPSAiRXZpZGVuY2Ugc3RyZW5ndGhcbmVxdWl2YWxlbnQiKSsgIAogIHNjYWxlX2NvbG9yX2JyZXdlcihwYWxldHRlID0gIlBhc3RlbDIiKSsKICBzY2FsZV9maWxsX2JyZXdlcihwYWxldHRlID0gIlBhc3RlbDIiKSsKICBndWlkZXMoZmlsbD1GQUxTRSkrCiAgI3NjYWxlX2ZpbGxfbWFudWFsKHZhbHVlcyA9IHZhcmlhbnRfY29sb3JzKSArCiAgc2NhbGVfc2hhcGVfbWFudWFsKHZhbHVlcyA9IGV2aWRlbmNlX3NoYXBlICkgKwogIHNjYWxlX3hfbG9nMTAoYnJlYWtzID0gdHJhbnNfYnJlYWtzKCJsb2cxMCIsIGZ1bmN0aW9uKHgpIDEwXngpLAogICAgICAgICAgICAgICAgbGFiZWxzID0gdHJhbnNfZm9ybWF0KCJsb2cxMCIsIG1hdGhfZm9ybWF0KDEwXi54KSkpKwogIHRoZW1lX2NsYXNzaWMoKSsKICB0aGVtZShheGlzLnRpdGxlLnk9IGVsZW1lbnRfdGV4dCggc2l6ZT0xMiwgIGZhY2U9ImJvbGQiKSwKICAgICAgICBheGlzLnRpdGxlLng9IGVsZW1lbnRfdGV4dCggc2l6ZT0xMiwgIGZhY2U9ImJvbGQiKSwKICAgICAgICBheGlzLnRleHQueCA9IGVsZW1lbnRfdGV4dChmYWNlPSJib2xkIiwgIHNpemU9MTIpLAogICAgICAgIGF4aXMudGV4dC55PSBlbGVtZW50X3RleHQoZmFjZT0iYm9sZCIsICBzaXplPTEyKSkKCgoKCgojJyAjIyBPZGRzUGF0aCBmb3IgRkRSIHRocmVzaG9sZHMKdGhyZXNob2xkcyA8LSBzZXEoMCwgMSwgMC4wMSkKdF9pdGVyIDwtIGRhdGEuZnJhbWUoKQpmb3IgKHQgaW4gdGhyZXNob2xkcyl7CiAgIyMjIEFsbAogIFAxIDwtIG5yb3codnRvW1BhdGhvZ2VuaWNpdHkgPT0gIlBhdGhvZ2VuaWMiIF0pIC8gbnJvdyh2dG8pCiAgUDIgPC0gbnJvdyh2dG9bUGF0aG9nZW5pY2l0eSA9PSAiUGF0aG9nZW5pYyIgJiAgQVNfUEFESiA8IHRdKSAvIAogICAgKG5yb3codnRvWyBBU19QQURKIDwgdF0pICsxICkKICAKICBkZiA8LSBkYXRhLmZyYW1lKCJUeXBlIiA9ICJQLXZhbHVlIiwKICAgICAgICAgICAgICAgICAgICJWYXJpYW50X3R5cGUiID0gIkFsbCIsCiAgICAgICAgICAgICAgICAgICAiVGhyZXNob2xkIiA9IHQsCiAgICAgICAgICAgICAgICAgICAiT2Rkc1BhdGgiID0gKFAyICogKDEgLSBQMSkgKSAvICgoMSAtIFAyKSAqIFAxICkgKQogIAogIHRfaXRlciA8LSByYmluZCh0X2l0ZXIsIGRmKQogIAogICMjIyBQVFYKICBQMSA8LSBucm93KHZ0b1tQYXRob2dlbmljaXR5ID09ICJQYXRob2dlbmljIiBdKSAvIG5yb3codnRvKQogIFAyIDwtIG5yb3codnRvW1BhdGhvZ2VuaWNpdHkgPT0gIlBhdGhvZ2VuaWMiICYgIHZhcl90eXBlID09ICJQVFYiICYgIEFTX1BBREogPCB0XSkgLyAKICAgIChucm93KHZ0b1t2YXJfdHlwZSA9PSAiUFRWIiAmIEFTX1BBREogPCB0XSkgKzEgKQogIAogIGRmIDwtIGRhdGEuZnJhbWUoIlR5cGUiID0gIlAtdmFsdWUiLAogICAgICAgICAgICAgICAgICAgIlZhcmlhbnRfdHlwZSIgPSAiUFRWIiwKICAgICAgICAgICAgICAgICAgICJUaHJlc2hvbGQiID0gdCwKICAgICAgICAgICAgICAgICAgICJPZGRzUGF0aCIgPSAoUDIgKiAoMSAtIFAxKSApIC8gKCgxIC0gUDIpICogUDEgKSApCiAgCiAgdF9pdGVyIDwtIHJiaW5kKHRfaXRlciwgZGYpCiAgCiAgIyMjIENvZGluZwogIFAxIDwtIG5yb3codnRvW1BhdGhvZ2VuaWNpdHkgPT0gIlBhdGhvZ2VuaWMiIF0pIC8gbnJvdyh2dG8pCiAgUDIgPC0gbnJvdyh2dG9bUGF0aG9nZW5pY2l0eSA9PSAiUGF0aG9nZW5pYyIgJiAgdmFyX3R5cGUgPT0gIkNvZGluZyIgJiBBU19QQURKIDwgdF0pIC8gCiAgICAobnJvdyh2dG9bdmFyX3R5cGUgPT0gIkNvZGluZyIgJiBBU19QQURKIDwgdF0pICsxICkKICAKICBkZiA8LSBkYXRhLmZyYW1lKCJUeXBlIiA9ICJQLXZhbHVlIiwKICAgICAgICAgICAgICAgICAgICJWYXJpYW50X3R5cGUiID0gIkNvZGluZyIsCiAgICAgICAgICAgICAgICAgICAiVGhyZXNob2xkIiA9IHQsCiAgICAgICAgICAgICAgICAgICAiT2Rkc1BhdGgiID0gKFAyICogKDEgLSBQMSkgKSAvICgoMSAtIFAyKSAqIFAxICkgKQogIAogIHRfaXRlciA8LSByYmluZCh0X2l0ZXIsIGRmKQogIAogICMjIyBOb24tY29kaW5nCiAgUDEgPC0gbnJvdyh2dG9bUGF0aG9nZW5pY2l0eSA9PSAiUGF0aG9nZW5pYyIgXSkgLyBucm93KHZ0bykKICBQMiA8LSBucm93KHZ0b1tQYXRob2dlbmljaXR5ID09ICJQYXRob2dlbmljIiAmICB2YXJfdHlwZSA9PSAiTm9uLWNvZGluZyIgJiAgQVNfUEFESiA8IHRdKSAvIAogICAgKG5yb3codnRvW3Zhcl90eXBlID09ICJOb24tY29kaW5nIiAmIEFTX1BBREogPCB0XSkgKzEgKQogIAogIGRmIDwtIGRhdGEuZnJhbWUoIlR5cGUiID0gIlAtdmFsdWUiLAogICAgICAgICAgICAgICAgICAgIlZhcmlhbnRfdHlwZSIgPSAiTm9uLWNvZGluZyIsCiAgICAgICAgICAgICAgICAgICAiVGhyZXNob2xkIiA9IHQsCiAgICAgICAgICAgICAgICAgICAiT2Rkc1BhdGgiID0gKFAyICogKDEgLSBQMSkgKSAvICgoMSAtIFAyKSAqIFAxICkgKQogIAogIHRfaXRlciA8LSByYmluZCh0X2l0ZXIsIGRmKQogIAogICMjIyBTcGxpY2UKICBQMSA8LSBucm93KHZ0b1tQYXRob2dlbmljaXR5ID09ICJQYXRob2dlbmljIiBdKSAvIG5yb3codnRvKQogIFAyIDwtIG5yb3codnRvW1BhdGhvZ2VuaWNpdHkgPT0gIlBhdGhvZ2VuaWMiICYgIHZhcl90eXBlID09ICJTcGxpY2UiICYgIEFTX1BBREogPCB0XSkgLyAKICAgIChucm93KHZ0b1t2YXJfdHlwZSA9PSAiU3BsaWNlIiAmIEFTX1BBREogPCB0XSkgKzEgKQogIAogIGRmIDwtIGRhdGEuZnJhbWUoIlR5cGUiID0gIlAtdmFsdWUiLAogICAgICAgICAgICAgICAgICAgIlZhcmlhbnRfdHlwZSIgPSAiU3BsaWNlIiwKICAgICAgICAgICAgICAgICAgICJUaHJlc2hvbGQiID0gdCwKICAgICAgICAgICAgICAgICAgICJPZGRzUGF0aCIgPSAoUDIgKiAoMSAtIFAxKSApIC8gKCgxIC0gUDIpICogUDEgKSApCiAgCiAgdF9pdGVyIDwtIHJiaW5kKHRfaXRlciwgZGYpCn0KdF9pdGVyIDwtIGFzLmRhdGEudGFibGUodF9pdGVyKQp0X2l0ZXJbICBPZGRzUGF0aCA8PSAyLjEgLCAiRXZpZGVuY2Vfc3RyZW5ndGgiIDo9ICAiSW5kZXRlcm1pbmF0ZSIgXQp0X2l0ZXJbICBPZGRzUGF0aCA+IDIuMSAsICJFdmlkZW5jZV9zdHJlbmd0aCIgOj0gICJQUzMgc3VwcG9ydGluZyIgXQp0X2l0ZXJbICBPZGRzUGF0aCA+IDQuMyAsICJFdmlkZW5jZV9zdHJlbmd0aCIgOj0gICJQUzMgbW9kZXJhdGUiIF0KdF9pdGVyWyAgT2Rkc1BhdGggPiAxOC43ICwgIkV2aWRlbmNlX3N0cmVuZ3RoIiA6PSAgIlBTMyBzdHJvbmciIF0KdF9pdGVyWyAgT2Rkc1BhdGggPiAzNTAgLCAiRXZpZGVuY2Vfc3RyZW5ndGgiIDo9ICAiUFMzIHZlcnkgc3Ryb25nIiBdCnRfaXRlciRFdmlkZW5jZV9zdHJlbmd0aCA8LSBmYWN0b3IodF9pdGVyJEV2aWRlbmNlX3N0cmVuZ3RoLCAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBsZXZlbHM9IGMoIkluZGV0ZXJtaW5hdGUiLCAiUFMzIHN1cHBvcnRpbmciLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAiUFMzIG1vZGVyYXRlIiwgIlBTMyBzdHJvbmciLCAiUFMzIHZlcnkgc3Ryb25nIikpCgojKyBmaWcud2lkdGg9MTAsIGZpZy5oZWlnaHQ9NwpnZ3Bsb3QodF9pdGVyW1RocmVzaG9sZCA+IDBdLCBhZXMoVGhyZXNob2xkLCBPZGRzUGF0aCkpKwogICNnZW9tX3ZsaW5lKHhpbnRlcmNlcHQgPSAwKSsKICBnZW9tX3ZsaW5lKHhpbnRlcmNlcHQgPSAwLjAxLCBsaW5ldHlwZSA9ICJkYXNoZWQiKSsKICBnZW9tX3ZsaW5lKHhpbnRlcmNlcHQgPSAwLjA1LCBsaW5ldHlwZSA9ICJkYXNoZWQiKSsKICAKICBnZW9tX2hsaW5lKHlpbnRlcmNlcHQgPSAyLjEsIGxpbmV0eXBlID0gImRhc2hlZCIpKwogIGdlb21faGxpbmUoeWludGVyY2VwdCA9IDQuMywgbGluZXR5cGUgPSAiZGFzaGVkIikrCiAgZ2VvbV9obGluZSh5aW50ZXJjZXB0ID0gMTguNywgbGluZXR5cGUgPSAiZGFzaGVkIikrCiAgIyBnZW9tX2hsaW5lKHlpbnRlcmNlcHQgPSAzNTAsIGxpbmV0eXBlID0gImRhc2hlZCIpKwogIAogIGdlb21fbGluZShhZXMoY29sb3VyID0gVmFyaWFudF90eXBlKSwgc2l6ZSA9IDEuMSkrCiAgZ2VvbV9wb2ludChhZXMoZmlsbCA9IFZhcmlhbnRfdHlwZSwgc2hhcGUgPSBFdmlkZW5jZV9zdHJlbmd0aCksIHNpemUgPSAzLCBjb2xvdXIgPSAiZ3JleTIwIikrCiAgeGxhYigiRkRSIHRocmVzaG9sZCIpICsgCiAgeWxhYigiT2RkcyBvZiBwYXRob2dlbmljaXR5IChPZGRzUGF0aCkiKSArCiAgbGFicyhmaWxsID0gIlZhcmlhbnQgdHlwZSIsIAogICAgICAgY29sb3VyID0gIlZhcmlhbnQgdHlwZSIsIAogICAgICAgc2hhcGUgPSAiRXZpZGVuY2Ugc3RyZW5ndGhcbmVxdWl2YWxlbnQiKSsgIAogIHNjYWxlX2NvbG9yX2JyZXdlcihwYWxldHRlID0gIlBhc3RlbDIiKSsKICBzY2FsZV9maWxsX2JyZXdlcihwYWxldHRlID0gIlBhc3RlbDIiKSsKICBndWlkZXMoZmlsbD1GQUxTRSkrCiAgI3NjYWxlX2ZpbGxfbWFudWFsKHZhbHVlcyA9IHZhcmlhbnRfY29sb3JzKSArCiAgc2NhbGVfc2hhcGVfbWFudWFsKHZhbHVlcyA9IGV2aWRlbmNlX3NoYXBlICkgKwogIHRoZW1lX2NsYXNzaWMoKSsKICB0aGVtZShheGlzLnRpdGxlLnk9IGVsZW1lbnRfdGV4dCggc2l6ZT0xMiwgIGZhY2U9ImJvbGQiKSwKICAgICAgICBheGlzLnRpdGxlLng9IGVsZW1lbnRfdGV4dCggc2l6ZT0xMiwgIGZhY2U9ImJvbGQiKSwKICAgICAgICBheGlzLnRleHQueCA9IGVsZW1lbnRfdGV4dChmYWNlPSJib2xkIiwgIHNpemU9MTIpLAogICAgICAgIGF4aXMudGV4dC55PSBlbGVtZW50X3RleHQoZmFjZT0iYm9sZCIsICBzaXplPTEyKSkKCgoKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjCgojJyAjIEJlbmlnbiBmdW5jdGlvbmFsIGV2aWRlbmNlIAoKIycgIyMgT2Rkc1BhdGggZm9yIHAtdmFsdWUgdGhyZXNob2xkcwojIHRocmVzaG9sZHMgPC0gc2VxKDAsIDAuMDUsIDAuMDAxKQp0aHJlc2hvbGRzIDwtIGMoMCwgMTBeLTYsIDEwXi01LCAxMF4tNCwgMC4wMDEsIDAuMDA1LCAwLjA1LCAwLjAxLCAwLjEsIDAuMikKdF9pdGVyIDwtIGRhdGEuZnJhbWUoKQpmb3IgKHQgaW4gdGhyZXNob2xkcyl7CiAgIyMjIEFsbAogIFAxIDwtIG5yb3codnRvW1BhdGhvZ2VuaWNpdHkgPT0gIlBhdGhvZ2VuaWMiIF0pIC8gbnJvdyh2dG8pCiAgUDIgPC0gbnJvdyh2dG9bUGF0aG9nZW5pY2l0eSA9PSAiUGF0aG9nZW5pYyIgJiAgQVNfUFZBTFVFID4gdF0pIC8gCiAgICAobnJvdyh2dG9bIEFTX1BWQUxVRSA+IHRdKSArMSApCiAgCiAgZGYgPC0gZGF0YS5mcmFtZSgiVHlwZSIgPSAiUC12YWx1ZSIsCiAgICAgICAgICAgICAgICAgICAiVmFyaWFudF90eXBlIiA9ICJBbGwiLAogICAgICAgICAgICAgICAgICAgIlRocmVzaG9sZCIgPSB0LAogICAgICAgICAgICAgICAgICAgIk9kZHNQYXRoIiA9IChQMiAqICgxIC0gUDEpICkgLyAoKDEgLSBQMikgKiBQMSApICkKICAKICB0X2l0ZXIgPC0gcmJpbmQodF9pdGVyLCBkZikKICAKICAjIyMgUFRWCiAgUDEgPC0gbnJvdyh2dG9bUGF0aG9nZW5pY2l0eSA9PSAiUGF0aG9nZW5pYyIgXSkgLyBucm93KHZ0bykKICBQMiA8LSBucm93KHZ0b1tQYXRob2dlbmljaXR5ID09ICJQYXRob2dlbmljIiAmICB2YXJfdHlwZSA9PSAiUFRWIiAmICBBU19QVkFMVUUgID4gdF0pIC8gCiAgICAobnJvdyh2dG9bdmFyX3R5cGUgPT0gIlBUViIgJiBBU19QVkFMVUUgID4gdF0pICsxICkKICAKICBkZiA8LSBkYXRhLmZyYW1lKCJUeXBlIiA9ICJQLXZhbHVlIiwKICAgICAgICAgICAgICAgICAgICJWYXJpYW50X3R5cGUiID0gIlBUViIsCiAgICAgICAgICAgICAgICAgICAiVGhyZXNob2xkIiA9IHQsCiAgICAgICAgICAgICAgICAgICAiT2Rkc1BhdGgiID0gKFAyICogKDEgLSBQMSkgKSAvICgoMSAtIFAyKSAqIFAxICkgKQogIAogIHRfaXRlciA8LSByYmluZCh0X2l0ZXIsIGRmKQogIAogICMjIyBDb2RpbmcKICBQMSA8LSBucm93KHZ0b1tQYXRob2dlbmljaXR5ID09ICJQYXRob2dlbmljIiBdKSAvIG5yb3codnRvKQogIFAyIDwtIG5yb3codnRvW1BhdGhvZ2VuaWNpdHkgPT0gIlBhdGhvZ2VuaWMiICYgIHZhcl90eXBlID09ICJDb2RpbmciICYgQVNfUFZBTFVFICA+IHRdKSAvIAogICAgKG5yb3codnRvW3Zhcl90eXBlID09ICJDb2RpbmciICYgQVNfUFZBTFVFICA+IHRdKSArMSApCiAgCiAgZGYgPC0gZGF0YS5mcmFtZSgiVHlwZSIgPSAiUC12YWx1ZSIsCiAgICAgICAgICAgICAgICAgICAiVmFyaWFudF90eXBlIiA9ICJDb2RpbmciLAogICAgICAgICAgICAgICAgICAgIlRocmVzaG9sZCIgPSB0LAogICAgICAgICAgICAgICAgICAgIk9kZHNQYXRoIiA9IChQMiAqICgxIC0gUDEpICkgLyAoKDEgLSBQMikgKiBQMSApICkKICAKICB0X2l0ZXIgPC0gcmJpbmQodF9pdGVyLCBkZikKICAKICAjIyMgTm9uLWNvZGluZwogIFAxIDwtIG5yb3codnRvW1BhdGhvZ2VuaWNpdHkgPT0gIlBhdGhvZ2VuaWMiIF0pIC8gbnJvdyh2dG8pCiAgUDIgPC0gbnJvdyh2dG9bUGF0aG9nZW5pY2l0eSA9PSAiUGF0aG9nZW5pYyIgJiAgdmFyX3R5cGUgPT0gIk5vbi1jb2RpbmciICYgIEFTX1BWQUxVRSA+IHRdKSAvIAogICAgKG5yb3codnRvW3Zhcl90eXBlID09ICJOb24tY29kaW5nIiAmIEFTX1BWQUxVRSAgPiB0XSkgKzEgKQogIAogIGRmIDwtIGRhdGEuZnJhbWUoIlR5cGUiID0gIlAtdmFsdWUiLAogICAgICAgICAgICAgICAgICAgIlZhcmlhbnRfdHlwZSIgPSAiTm9uLWNvZGluZyIsCiAgICAgICAgICAgICAgICAgICAiVGhyZXNob2xkIiA9IHQsCiAgICAgICAgICAgICAgICAgICAiT2Rkc1BhdGgiID0gKFAyICogKDEgLSBQMSkgKSAvICgoMSAtIFAyKSAqIFAxICkgKQogIAogIHRfaXRlciA8LSByYmluZCh0X2l0ZXIsIGRmKQogIAogICMjIyBTcGxpY2UKICBQMSA8LSBucm93KHZ0b1tQYXRob2dlbmljaXR5ID09ICJQYXRob2dlbmljIiBdKSAvIG5yb3codnRvKQogIFAyIDwtIG5yb3codnRvW1BhdGhvZ2VuaWNpdHkgPT0gIlBhdGhvZ2VuaWMiICYgIHZhcl90eXBlID09ICJTcGxpY2UiICYgIEFTX1BWQUxVRSA+IHRdKSAvIAogICAgKG5yb3codnRvW3Zhcl90eXBlID09ICJTcGxpY2UiICYgQVNfUFZBTFVFID4gdF0pICsxICkKICAKICBkZiA8LSBkYXRhLmZyYW1lKCJUeXBlIiA9ICJQLXZhbHVlIiwKICAgICAgICAgICAgICAgICAgICJWYXJpYW50X3R5cGUiID0gIlNwbGljZSIsCiAgICAgICAgICAgICAgICAgICAiVGhyZXNob2xkIiA9IHQsCiAgICAgICAgICAgICAgICAgICAiT2Rkc1BhdGgiID0gKFAyICogKDEgLSBQMSkgKSAvICgoMSAtIFAyKSAqIFAxICkgKQogIAogIHRfaXRlciA8LSByYmluZCh0X2l0ZXIsIGRmKQp9CnRfaXRlciA8LSBhcy5kYXRhLnRhYmxlKHRfaXRlcikKdF9pdGVyWyAgT2Rkc1BhdGggPj0gMC40OCAsICJFdmlkZW5jZV9zdHJlbmd0aCIgOj0gICJJbmRldGVybWluYXRlIiBdCnRfaXRlclsgIE9kZHNQYXRoIDwgMC40OCAsICJFdmlkZW5jZV9zdHJlbmd0aCIgOj0gICJCUzMgc3VwcG9ydGluZyIgXQp0X2l0ZXJbICBPZGRzUGF0aCA8MC4yMyAsICJFdmlkZW5jZV9zdHJlbmd0aCIgOj0gICJCUzMgbW9kZXJhdGUiIF0KdF9pdGVyWyAgT2Rkc1BhdGggPDAuMDUzICwgIkV2aWRlbmNlX3N0cmVuZ3RoIiA6PSAgIkJTMyBzdHJvbmciIF0KdF9pdGVyWyAgT2Rkc1BhdGggPCAwLjAwMjkgLCAiRXZpZGVuY2Vfc3RyZW5ndGgiIDo9ICAiQlMzIHZlcnkgc3Ryb25nIiBdCnRfaXRlciRFdmlkZW5jZV9zdHJlbmd0aCA8LSBmYWN0b3IodF9pdGVyJEV2aWRlbmNlX3N0cmVuZ3RoLCAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBsZXZlbHM9IGMoIkluZGV0ZXJtaW5hdGUiLCAiQlMzIHN1cHBvcnRpbmciLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAiQlMzIG1vZGVyYXRlIiwgIkJTMyBzdHJvbmciLCAiQlMzIHZlcnkgc3Ryb25nIikpCgojKyBmaWcud2lkdGg9MTAsIGZpZy5oZWlnaHQ9NwpnZ3Bsb3QodF9pdGVyW1RocmVzaG9sZCA+IDBdLCBhZXMoVGhyZXNob2xkLCBPZGRzUGF0aCkpKwogICNnZW9tX3ZsaW5lKHhpbnRlcmNlcHQgPSAwKSsKICAjZ2VvbV92bGluZSh4aW50ZXJjZXB0ID0gMC4wMSwgbGluZXR5cGUgPSAiZGFzaGVkIikrCiAgZ2VvbV92bGluZSh4aW50ZXJjZXB0ID0gMC4wNSwgbGluZXR5cGUgPSAiZGFzaGVkIikrCiAgCiAgZ2VvbV9obGluZSh5aW50ZXJjZXB0ID0gMC40OCwgbGluZXR5cGUgPSAiZGFzaGVkIikrCiAgZ2VvbV9obGluZSh5aW50ZXJjZXB0ID0gMC4yMywgbGluZXR5cGUgPSAiZGFzaGVkIikrCiAgZ2VvbV9obGluZSh5aW50ZXJjZXB0ID0gMC4wNTMsIGxpbmV0eXBlID0gImRhc2hlZCIpKwogICMgZ2VvbV9obGluZSh5aW50ZXJjZXB0ID0gMC4wMDI5LCBsaW5ldHlwZSA9ICJkYXNoZWQiKSsKICAKICBnZW9tX2xpbmUoYWVzKGNvbG91ciA9IFZhcmlhbnRfdHlwZSksIHNpemUgPSAxLjEpKwogIGdlb21fcG9pbnQoYWVzKGZpbGwgPSBWYXJpYW50X3R5cGUsIHNoYXBlID0gRXZpZGVuY2Vfc3RyZW5ndGgpLCBzaXplID0gMywgY29sb3VyID0gImdyZXkyMCIpKwogIHhsYWIoInAtdmFsdWUgdGhyZXNob2xkIikgKyAKICB5bGFiKCJPZGRzIG9mIHBhdGhvZ2VuaWNpdHkgKE9kZHNQYXRoKSIpICsKICBsYWJzKGZpbGwgPSAiVmFyaWFudCB0eXBlIiwgCiAgICAgICBjb2xvdXIgPSAiVmFyaWFudCB0eXBlIiwgCiAgICAgICBzaGFwZSA9ICJFdmlkZW5jZSBzdHJlbmd0aFxuZXF1aXZhbGVudCIpKyAgCiAgc2NhbGVfY29sb3JfYnJld2VyKHBhbGV0dGUgPSAiUGFzdGVsMiIpKwogIHNjYWxlX2ZpbGxfYnJld2VyKHBhbGV0dGUgPSAiUGFzdGVsMiIpKwogIGd1aWRlcyhmaWxsPUZBTFNFKSsKICAjc2NhbGVfZmlsbF9tYW51YWwodmFsdWVzID0gdmFyaWFudF9jb2xvcnMpICsKICBzY2FsZV9zaGFwZV9tYW51YWwodmFsdWVzID0gZXZpZGVuY2Vfc2hhcGUgKSArCiAgc2NhbGVfeF9sb2cxMChicmVha3MgPSB0cmFuc19icmVha3MoImxvZzEwIiwgZnVuY3Rpb24oeCkgMTBeeCksCiAgICAgICAgICAgICAgICBsYWJlbHMgPSB0cmFuc19mb3JtYXQoImxvZzEwIiwgbWF0aF9mb3JtYXQoMTBeLngpKSkrCiAgdGhlbWVfY2xhc3NpYygpKwogIHRoZW1lKGF4aXMudGl0bGUueT0gZWxlbWVudF90ZXh0KCBzaXplPTEyLCAgZmFjZT0iYm9sZCIpLAogICAgICAgIGF4aXMudGl0bGUueD0gZWxlbWVudF90ZXh0KCBzaXplPTEyLCAgZmFjZT0iYm9sZCIpLAogICAgICAgIGF4aXMudGV4dC54ID0gZWxlbWVudF90ZXh0KGZhY2U9ImJvbGQiLCAgc2l6ZT0xMiksCiAgICAgICAgYXhpcy50ZXh0Lnk9IGVsZW1lbnRfdGV4dChmYWNlPSJib2xkIiwgIHNpemU9MTIpKQoKCgoKCiMnICMjIE9kZHNQYXRoIGZvciBlZmZlY3Qgc2l6ZSBmb3Igbm9taW5hbCBzaWduaWZpY2FudCBhYmVycmFudCBzcGxpY2luZyAocC12YWx1ZSA8IDAuMDUpCgp2dG9bLCBBYnNfZWZmZWN0X3NpemUgOj0gYWJzKGRlbHRhUHNpKSBdCnRocmVzaG9sZHMgPC0gc2VxKDAsIDAuNjUsIDAuMDUpCgp0X2l0ZXIgPC0gZGF0YS5mcmFtZSgpCmZvciAodCBpbiB0aHJlc2hvbGRzKXsKICAjIyMgQWxsCiAgUDEgPC0gbnJvdyh2dG9bUGF0aG9nZW5pY2l0eSA9PSAiUGF0aG9nZW5pYyIgXSkgLyBucm93KHZ0bykKICBQMiA8LSBucm93KHZ0b1tQYXRob2dlbmljaXR5ID09ICJQYXRob2dlbmljIiAmIEFTX1BWQUxVRSA+IDAuMDUgJiBBYnNfZWZmZWN0X3NpemUgPCB0XSkgLyAKICAgIChucm93KHZ0b1sgQVNfUFZBTFVFID4gMC4wNSAmIEFic19lZmZlY3Rfc2l6ZSA8IHRdKSArMSApCiAgCiAgZGYgPC0gZGF0YS5mcmFtZSgiVHlwZSIgPSAiRkMiLAogICAgICAgICAgICAgICAgICAgIlZhcmlhbnRfdHlwZSIgPSAiQWxsIiwKICAgICAgICAgICAgICAgICAgICJUaHJlc2hvbGQiID0gdCwKICAgICAgICAgICAgICAgICAgICJPZGRzUGF0aCIgPSAoUDIgKiAoMSAtIFAxKSApIC8gKCgxIC0gUDIpICogUDEgKSApCiAgCiAgdF9pdGVyIDwtIHJiaW5kKHRfaXRlciwgZGYpCiAgCiAgIyMjIFBUVgogIFAxIDwtIG5yb3codnRvW1BhdGhvZ2VuaWNpdHkgPT0gIlBhdGhvZ2VuaWMiIF0pIC8gbnJvdyh2dG8pCiAgUDIgPC0gbnJvdyh2dG9bUGF0aG9nZW5pY2l0eSA9PSAiUGF0aG9nZW5pYyIgJiAgdmFyX3R5cGUgPT0gIlBUViIgJiAgQVNfUFZBTFVFID4gMC4wNSAmIEFic19lZmZlY3Rfc2l6ZSA8IHRdKSAvIAogICAgKG5yb3codnRvW3Zhcl90eXBlID09ICJQVFYiICYgIEFTX1BWQUxVRSA+IDAuMDUgJiBBYnNfZWZmZWN0X3NpemUgPCB0XSkgKzEgKQogIAogIGRmIDwtIGRhdGEuZnJhbWUoIlR5cGUiID0gIkZDIiwKICAgICAgICAgICAgICAgICAgICJWYXJpYW50X3R5cGUiID0gIlBUViIsCiAgICAgICAgICAgICAgICAgICAiVGhyZXNob2xkIiA9IHQsCiAgICAgICAgICAgICAgICAgICAiT2Rkc1BhdGgiID0gKFAyICogKDEgLSBQMSkgKSAvICgoMSAtIFAyKSAqIFAxICkgKQogIAogIHRfaXRlciA8LSByYmluZCh0X2l0ZXIsIGRmKQogIAogICMjIyBDb2RpbmcKICBQMSA8LSBucm93KHZ0b1tQYXRob2dlbmljaXR5ID09ICJQYXRob2dlbmljIiBdKSAvIG5yb3codnRvKQogIFAyIDwtIG5yb3codnRvW1BhdGhvZ2VuaWNpdHkgPT0gIlBhdGhvZ2VuaWMiICYgIHZhcl90eXBlID09ICJDb2RpbmciICYgIEFTX1BWQUxVRSA+IDAuMDUgJiBBYnNfZWZmZWN0X3NpemUgPCB0XSkgLyAKICAgIChucm93KHZ0b1t2YXJfdHlwZSA9PSAiQ29kaW5nIiAmICBBU19QVkFMVUUgPiAwLjA1ICYgQWJzX2VmZmVjdF9zaXplIDwgdF0pICsxICkKICAKICBkZiA8LSBkYXRhLmZyYW1lKCJUeXBlIiA9ICJGQyIsCiAgICAgICAgICAgICAgICAgICAiVmFyaWFudF90eXBlIiA9ICJDb2RpbmciLAogICAgICAgICAgICAgICAgICAgIlRocmVzaG9sZCIgPSB0LAogICAgICAgICAgICAgICAgICAgIk9kZHNQYXRoIiA9IChQMiAqICgxIC0gUDEpICkgLyAoKDEgLSBQMikgKiBQMSApICkKICAKICB0X2l0ZXIgPC0gcmJpbmQodF9pdGVyLCBkZikKICAKICAjIyMgTm9uLWNvZGluZwogIFAxIDwtIG5yb3codnRvW1BhdGhvZ2VuaWNpdHkgPT0gIlBhdGhvZ2VuaWMiIF0pIC8gbnJvdyh2dG8pCiAgUDIgPC0gbnJvdyh2dG9bUGF0aG9nZW5pY2l0eSA9PSAiUGF0aG9nZW5pYyIgJiAgdmFyX3R5cGUgPT0gIk5vbi1jb2RpbmciICYgIEFTX1BWQUxVRSA+IDAuMDUgJiBBYnNfZWZmZWN0X3NpemUgPCB0XSkgLyAKICAgIChucm93KHZ0b1t2YXJfdHlwZSA9PSAiTm9uLWNvZGluZyIgJiAgQVNfUFZBTFVFID4gMC4wNSAmIEFic19lZmZlY3Rfc2l6ZSA8IHRdKSArMSApCiAgCiAgZGYgPC0gZGF0YS5mcmFtZSgiVHlwZSIgPSAiRkMiLAogICAgICAgICAgICAgICAgICAgIlZhcmlhbnRfdHlwZSIgPSAiTm9uLWNvZGluZyIsCiAgICAgICAgICAgICAgICAgICAiVGhyZXNob2xkIiA9IHQsCiAgICAgICAgICAgICAgICAgICAiT2Rkc1BhdGgiID0gKFAyICogKDEgLSBQMSkgKSAvICgoMSAtIFAyKSAqIFAxICkgKQogIAogIHRfaXRlciA8LSByYmluZCh0X2l0ZXIsIGRmKQogIAogICMjIyBTcGxpY2UKICBQMSA8LSBucm93KHZ0b1tQYXRob2dlbmljaXR5ID09ICJQYXRob2dlbmljIiBdKSAvIG5yb3codnRvKQogIFAyIDwtIG5yb3codnRvW1BhdGhvZ2VuaWNpdHkgPT0gIlBhdGhvZ2VuaWMiICYgIHZhcl90eXBlID09ICJTcGxpY2UiICYgICBBU19QVkFMVUUgPiAwLjA1ICYgQWJzX2VmZmVjdF9zaXplIDwgdF0pIC8gCiAgICAobnJvdyh2dG9bdmFyX3R5cGUgPT0gIlNwbGljZSIgJiAgQVNfUFZBTFVFID4gMC4wNSAmIEFic19lZmZlY3Rfc2l6ZSA8IHRdKSArMSApCiAgCiAgZGYgPC0gZGF0YS5mcmFtZSgiVHlwZSIgPSAiRkMiLAogICAgICAgICAgICAgICAgICAgIlZhcmlhbnRfdHlwZSIgPSAiU3BsaWNlIiwKICAgICAgICAgICAgICAgICAgICJUaHJlc2hvbGQiID0gdCwKICAgICAgICAgICAgICAgICAgICJPZGRzUGF0aCIgPSAoUDIgKiAoMSAtIFAxKSApIC8gKCgxIC0gUDIpICogUDEgKSApCiAgCiAgdF9pdGVyIDwtIHJiaW5kKHRfaXRlciwgZGYpCn0KdF9pdGVyIDwtIGFzLmRhdGEudGFibGUodF9pdGVyKQp0X2l0ZXJbICBPZGRzUGF0aCA8PSAyLjEgLCAiRXZpZGVuY2Vfc3RyZW5ndGgiIDo9ICAiSW5kZXRlcm1pbmF0ZSIgXQp0X2l0ZXJbICBPZGRzUGF0aCA+IDIuMSAsICJFdmlkZW5jZV9zdHJlbmd0aCIgOj0gICJQUzMgc3VwcG9ydGluZyIgXQp0X2l0ZXJbICBPZGRzUGF0aCA+IDQuMyAsICJFdmlkZW5jZV9zdHJlbmd0aCIgOj0gICJQUzMgbW9kZXJhdGUiIF0KdF9pdGVyWyAgT2Rkc1BhdGggPiAxOC43ICwgIkV2aWRlbmNlX3N0cmVuZ3RoIiA6PSAgIlBTMyBzdHJvbmciIF0KdF9pdGVyWyAgT2Rkc1BhdGggPiAzNTAgLCAiRXZpZGVuY2Vfc3RyZW5ndGgiIDo9ICAiUFMzIHZlcnkgc3Ryb25nIiBdCnRfaXRlciRFdmlkZW5jZV9zdHJlbmd0aCA8LSBmYWN0b3IodF9pdGVyJEV2aWRlbmNlX3N0cmVuZ3RoLCAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBsZXZlbHM9IGMoIkluZGV0ZXJtaW5hdGUiLCAiUFMzIHN1cHBvcnRpbmciLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAiUFMzIG1vZGVyYXRlIiwgIlBTMyBzdHJvbmciLCAiUFMzIHZlcnkgc3Ryb25nIikpCgoKCgoKIysgZmlnLndpZHRoPTEwLCBmaWcuaGVpZ2h0PTcKZ2dwbG90KHRfaXRlclsgVGhyZXNob2xkID49IDAuMSAmIFRocmVzaG9sZCA8IDAuNjVdLCBhZXMoVGhyZXNob2xkLCBPZGRzUGF0aCkpKwogIGdlb21fdmxpbmUoeGludGVyY2VwdCA9IDAuMywgbGluZXR5cGUgPSAiZGFzaGVkIiwgY29sb3IgPSAicmVkIikrCiAgCiAgZ2VvbV9obGluZSh5aW50ZXJjZXB0ID0gMi4xLCBsaW5ldHlwZSA9ICJkYXNoZWQiKSsKICBnZW9tX2hsaW5lKHlpbnRlcmNlcHQgPSA0LjMsIGxpbmV0eXBlID0gImRhc2hlZCIpKwogIGdlb21faGxpbmUoeWludGVyY2VwdCA9IDE4LjcsIGxpbmV0eXBlID0gImRhc2hlZCIpKwogICMgZ2VvbV9obGluZSh5aW50ZXJjZXB0ID0gMzUwLCBsaW5ldHlwZSA9ICJkYXNoZWQiKSsKICAKICBnZW9tX2xpbmUoYWVzKGNvbG91ciA9IFZhcmlhbnRfdHlwZSksc2l6ZSA9IDEuMSkrCiAgZ2VvbV9wb2ludChhZXMoZmlsbCA9IFZhcmlhbnRfdHlwZSwgc2hhcGUgPSBFdmlkZW5jZV9zdHJlbmd0aCksIHNpemUgPSAzLCBjb2xvdXIgPSAiZ3JleTIwIikrCiAgeGxhYigifGVmZmVjdCBzaXplfCB0aHJlc2hvbGQgb2Zcbm9taW5hbHkgc2lnbmlmaWNhbnQgYWJlcnJhbnQgc3BsaWNpbmciKSArIAogIHlsYWIoIk9kZHMgb2YgcGF0aG9nZW5pY2l0eSAoT2Rkc1BhdGgpIikgKwogIGxhYnMoZmlsbCA9ICJWYXJpYW50IHR5cGUiLCAKICAgICAgIGNvbG91ciA9ICJWYXJpYW50IHR5cGUiLCAKICAgICAgIHNoYXBlID0gIkV2aWRlbmNlIHN0cmVuZ3RoXG5lcXVpdmFsZW50IikrICAKICBzY2FsZV9jb2xvcl9icmV3ZXIocGFsZXR0ZSA9ICJQYXN0ZWwyIikrCiAgc2NhbGVfZmlsbF9icmV3ZXIocGFsZXR0ZSA9ICJQYXN0ZWwyIikrCiAgI3NjYWxlX2ZpbGxfbWFudWFsKHZhbHVlcyA9IHZhcmlhbnRfY29sb3JzKSArCiAgc2NhbGVfc2hhcGVfbWFudWFsKHZhbHVlcyA9IGV2aWRlbmNlX3NoYXBlICkgKwogIHNjYWxlX3hfY29udGludW91cyhicmVha3M9YygwLjEsIDAuMiwgMC4zLCAwLjQsIDAuNSwgMC42KSwgbGFiZWw9YygiPjAuMSIsICI+MC4yIiwgIj4wLjMiLCAiPjAuNCIsICI+MC41IiwgIj4wLjYiKSkrCiAgZ3VpZGVzKGZpbGw9RkFMU0UpKwogIAogIHRoZW1lX2NsYXNzaWMoKSsKICB0aGVtZShheGlzLnRpdGxlLnk9IGVsZW1lbnRfdGV4dCggc2l6ZT0xMiwgIGZhY2U9ImJvbGQiKSwKICAgICAgICBheGlzLnRpdGxlLng9IGVsZW1lbnRfdGV4dCggc2l6ZT0xMiwgIGZhY2U9ImJvbGQiKSwKICAgICAgICBheGlzLnRleHQueCA9IGVsZW1lbnRfdGV4dChmYWNlPSJib2xkIiwgIHNpemU9MTIpLAogICAgICAgIGF4aXMudGV4dC55PSBlbGVtZW50X3RleHQoZmFjZT0iYm9sZCIsICBzaXplPTEyKSkKCgoKCgoKCgoKCg==</div>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeSourceEmbed("Aberrant_splicing.R");
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
